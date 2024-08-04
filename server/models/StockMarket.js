@@ -2,21 +2,16 @@
 import mongoose from 'mongoose';
 
 const stockMarketSchema = new mongoose.Schema({
-    indexName: {
+    indicesName: {
         type: String,
         required: true,
     },
-    currentValue: {
+    Price: {
         type: Number,
         required: true,
     },
-    changePercentage: {
+    priceChange: {
         type: Number,
-        required: true,
-    },
-    marketStatus: {
-        type: String,
-        enum: ['Open', 'Closed'],
         required: true,
     },
     date: {
