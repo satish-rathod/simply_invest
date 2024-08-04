@@ -1,0 +1,26 @@
+{
+  "name": "simply_invest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start-server\" \"npm run start-client\"",
+    "start-server": "cd server && npm start",
+    "start-client": "cd client && npm start"
+  },
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satish-rathod/simply-invest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/satish-rathod/simply-invest/issues"
+  },
+  "homepage": "https://github.com/satish-rathod/simply-invest#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
