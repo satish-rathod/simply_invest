@@ -6,7 +6,7 @@ import cron from 'node-cron';
 
 // Import your routes
 import authRoutes from './routes/authRoutes.js';
-import stockRoutes from './routes/stockRoutes.js'; // Ensure this path is correct
+import stockRoutes from './routes/stockRoutes.js';
 
 dotenv.config();
 
