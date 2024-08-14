@@ -31,6 +31,10 @@ const stockRecommendationSchema = new mongoose.Schema({
         required: true,
 
     },
+    date: {
+        type: Date,
+        default: Date.now,
+    },
 }, { timestamps: true });
 
 const StockRecommendation = mongoose.model('StockRecommendation', stockRecommendationSchema);
