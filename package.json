@@ -8,7 +8,6 @@
     "start-server": "cd server && npm start",
     "start-client": "cd client && npm start"
   },
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/satish-rathod/simply-invest.git"

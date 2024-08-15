@@ -2,17 +2,16 @@
 import express from 'express';
 import { processChatMessage } from '../utils/chatbot.js';
 import Conversation from '../models/conversation.js';
-import { protect } from '../middleware/authMiddleware.js'; // Assuming you have this middleware
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Send a message and get a response
 router.post('/message', protect, async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, conversationHistory } = req.body;
     const userId = req.user._id;
 
-    const response = await processChatMessage(userId, message);
+    const response = await processChatMessage(userId, message, conversationHistory);
 
     // Save the conversation
     await Conversation.findOneAndUpdate(
@@ -34,7 +33,6 @@ router.post('/message', protect, async (req, res) => {
   }
 });
 
-// Get conversation history
 router.get('/history', protect, async (req, res) => {
   try {
     const userId = req.user._id;

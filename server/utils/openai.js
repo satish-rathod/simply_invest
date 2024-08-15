@@ -17,7 +17,10 @@ export const generateChatResponse = async (messages) => {
     return completion.choices[0].message.content;
   } catch (error) {
     console.error('Error generating chat response:', error);
-    throw error;
+    if (error.response) {
+      console.error(error.response.status, error.response.data);
+    }
+    throw new Error('Failed to generate response. Please try again later.');
   }
 };
 
