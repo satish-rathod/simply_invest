@@ -13,9 +13,11 @@ const parseNumber = (value) => {
   return null;
 };
 
+const today = new Date().toISOString().split('T')[0];
+console.log(today);
+
 // Scraping function for stock recommendations
 export const scrapeStockRecommendations = async () => {
-  const today = new Date().toISOString().split('T')[0];
   try {
     // Check if data for today already exists
     const existingData = await StockRecommendation.findOne({ date: today });
@@ -89,6 +91,13 @@ export const scrapeStockRecommendations = async () => {
 // Scraping function for stock market data
 export const scrapeStockMarket = async () => {
   try {
+
+    const existingData = await StockMarket.findOne({ date: today });
+    if (existingData) {
+      console.log(`Stock Market data for ${today} already exists. Skipping scraping.`);
+      return;
+    }
+
     const url = 'https://www.5paisa.com/share-market-today/stocks-to-buy-or-sell-today'
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
@@ -109,24 +118,16 @@ export const scrapeStockMarket = async () => {
 
     console.log('Successfully scraped stock market data');
 
-    // Save data to MongoDB
-    const today = new Date().toISOString().split('T')[0];
     for (const data of stockMarketData) {
-      const existingData = await StockMarket.findOne({ 
+
+      const stockMarket = new StockMarket({
         indicesName: data.indicesName,
-        date: { $gte: new Date(today), $lt: new Date(today + 'T23:59:59.999Z') }
+        Price: data.Price,
+        priceChange: data.priceChange,
+        date: today,
       });
 
-      if (!existingData) {
-        const newStockMarket = new StockMarket({
-          ...data,
-          date: new Date(),
-        });
-        await newStockMarket.save();
-        console.log(`Data for ${data.indicesName} on ${today} has been uploaded.`);
-      } else {
-        console.log(`Data for ${data.indicesName} on ${today} already exists. Skipping.`);
-      }
+      await stockMarket.save();
     }
 
     console.log('Stock market data scraping and saving completed.');
