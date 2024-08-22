@@ -1,26 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Card, CardHeader, CardContent } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Send } from 'lucide-react';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const navigate = useNavigate();
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages]);
 
   useEffect(() => {
     fetchChatHistory();
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const fetchChatHistory = async () => {
     try {
@@ -31,45 +26,11 @@ const ChatInterface = () => {
       setMessages(response.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
-      if (error.response && error.response.status === 401) {
-        navigate('/login');
-      }
     }
   };
 
-  const formatMessage = (content) => {
-    const sections = content.split(/\*\*(?=Introduction|Conclusion)/);
-
-    return sections.map((section, sectionIndex) => {
-      if (section.startsWith('Introduction') || section.startsWith('Conclusion')) {
-        const [title, ...paragraphs] = section.split('**');
-        return (
-          <div key={sectionIndex} className="mb-4">
-            <h3 className="font-bold text-lg mb-2">{title.trim()}</h3>
-            {paragraphs.map((para, paraIndex) => (
-              <p key={paraIndex} className="mb-2">{para.trim()}</p>
-            ))}
-          </div>
-        );
-      }
-
-      const points = section.split(/\d+\.\s+/);
-      return (
-        <ol key={sectionIndex} className="list-decimal list-inside mb-4 pl-4">
-          {points.filter(point => point.trim()).map((point, pointIndex) => {
-            const [title, ...details] = point.split('**');
-            return (
-              <li key={pointIndex} className="mb-2">
-                <strong>{title.trim()}</strong>
-                {details.map((detail, detailIndex) => (
-                  <p key={detailIndex} className="ml-4 mt-1">{detail.trim()}</p>
-                ))}
-              </li>
-            );
-          })}
-        </ol>
-      );
-    });
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const sendMessage = async (e) => {
@@ -79,61 +40,67 @@ const ChatInterface = () => {
     const newMessage = { role: 'user', content: input };
     setMessages(prevMessages => [...prevMessages, newMessage]);
     setInput('');
-    setError('');
+    setIsLoading(true);
 
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post('http://localhost:5000/api/chat/message', 
-        { 
-          message: input,
-          conversationHistory: messages
-        },
+        { message: input },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const botMessage = { role: 'assistant', content: response.data.response };
       setMessages(prevMessages => [...prevMessages, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      if (error.response && error.response.status === 401) {
-        setError('Your session has expired. Please log in again.');
-        setTimeout(() => navigate('/login'), 3000);
-      } else {
-        setError('Failed to send message. Please try again.');
-      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Card className="h-[600px] flex flex-col">
-      <CardHeader>Chat with AI Financial Assistant</CardHeader>
-      <CardContent className="flex-grow overflow-auto mb-4">
+    <div className="flex flex-col h-full bg-gray-900 text-white">
+      <div className="flex-grow overflow-y-auto p-4">
         {messages.map((msg, index) => (
-          <div key={index} className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block p-4 rounded-lg max-w-[80%] ${
-              msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'
-            }`}>
-              {msg.role === 'user' ? (
-                <p>{msg.content}</p>
-              ) : (
-                <div className="prose prose-sm max-w-none">{formatMessage(msg.content)}</div>
-              )}
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`mb-4 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}
+          >
+            <div
+              className={`inline-block p-3 rounded-lg ${
+                msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'
+              }`}
+            >
+              {msg.content}
             </div>
-          </div>
+          </motion.div>
         ))}
+        {isLoading && (
+          <div className="text-center text-gray-500">AI is thinking...</div>
+        )}
         <div ref={messagesEndRef} />
-      </CardContent>
-      {error && <div className="text-red-500 text-center mb-2">{error}</div>}
-      <form onSubmit={sendMessage} className="flex p-4">
-        <Input 
-          type="text" 
-          value={input} 
-          onChange={(e) => setInput(e.target.value)} 
-          placeholder="Type your message..."
-          className="flex-grow mr-2"
-        />
-        <Button type="submit">Send</Button>
+      </div>
+      <form onSubmit={sendMessage} className="p-4 bg-gray-800">
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-grow p-2 rounded-l-lg bg-gray-700 text-white focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 p-2 rounded-r-lg hover:bg-blue-700 transition-colors"
+            disabled={isLoading}
+          >
+            <Send size={24} />
+          </button>
+        </div>
       </form>
-    </Card>
+    </div>
   );
 };
 
