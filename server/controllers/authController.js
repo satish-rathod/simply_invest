@@ -70,20 +70,20 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        console.log('Stored hashed password:', user.password);
-        console.log('Provided password:', password);
-
         const isMatch = await user.matchPassword(password);
 
         console.log('Password match result:', isMatch);
 
         if (isMatch) {
             console.log(`Login successful for user: ${user._id}`);
+            const token = generateToken(user._id);
             res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                token: generateToken(user._id),
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
+                },
+                token: token
             });
         } else {
             console.log(`Login failed: Incorrect password for user ${user._id}`);
