@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.14",
@@ -10,7 +11,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.3",
     "cheerio": "^1.0.0-rc.12",
-    "framer-motion": "^11.3.29",
+    "framer-motion": "^11.3.30",
     "lucide-react": "^0.429.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

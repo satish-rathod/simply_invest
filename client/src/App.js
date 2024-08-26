@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, MessageSquare } from 'lucide-react';
+import { Home, MessageSquare, TrendingUp, Newspaper } from 'lucide-react';
 import Register from './components/Register';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import ChatInterface from './components/ChatInterface';
 import UserProfile from './components/UserProfile';
+import MarketOverview from './components/MarketOverview'; // Add this import
 import logoImage from './logo.png';
 import defaultProfileImage from './profile1.png';
+import NewsSection from './components/NewsSection';
+
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -34,21 +37,22 @@ const App = () => {
         setUser(null);
     };
 
-
     return (
         <Router>
-            <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
-                <Sidebar />
-                <div className="flex flex-col flex-1 border-l border-gray-700">
-                    <Header user={user} onLogout={handleLogout} />
-                    <main className="flex-1 overflow-hidden bg-gray-900">
-                        <Routes>
+        <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+          <Sidebar />
+          <div className="flex flex-col flex-1 border-l border-gray-700">
+            <Header user={user} onLogout={handleLogout} />
+            <main className="flex-1 overflow-auto bg-gray-900">
+              <Routes>
                             <Route path="/register" element={<Register setUser={setUser} />} />
                             <Route path="/login" element={<Login setUser={setUser} />} />
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/chat" element={<ChatInterface />} />
                             <Route path="/profile" element={user ? <UserProfile user={user} /> : <Login setUser={setUser} />} />
+                            <Route path="/market-overview" element={<MarketOverview />} /> {/* Add this route */}
                             <Route path="/" element={<Dashboard />} />
+                            <Route path="/news" element={<NewsSection />} />
                         </Routes>
                     </main>
                 </div>
@@ -57,14 +61,15 @@ const App = () => {
     );
 };
 
-
 const Sidebar = () => {
     const location = useLocation();
 
     const navItems = [
         { icon: Home, label: 'Dashboard', path: '/dashboard' },
         { icon: MessageSquare, label: 'Chat', path: '/chat' },
-    ];
+        { icon: TrendingUp, label: 'Market Overview', path: '/market-overview' },
+        { icon: Newspaper, label: 'News', path: '/news' },
+      ];
 
     return (
         <aside className="w-64 bg-gray-900 text-white flex flex-col">
@@ -91,6 +96,7 @@ const Sidebar = () => {
         </aside>
     );
 };
+
 
 const Header = ({ user, onLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);

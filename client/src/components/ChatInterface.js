@@ -94,6 +94,7 @@ const ChatInterface = () => {
 
     try {
       const token = localStorage.getItem('token');
+      console.log('Token:', token); // Add this line
       if (!token) {
         navigate('/login');
         return;
@@ -105,15 +106,17 @@ const ChatInterface = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log('Response:', response.data); // Add this line
       const botMessage = { role: 'assistant', content: response.data.response };
       setMessages(prevMessages => [...prevMessages, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      console.log('Error response:', error.response); // Add this line
       handleError(error);
     } finally {
       setIsLoading(false);
     }
-  };
+};
 
   return (
     <div className="flex flex-col h-full bg-gray-900 p-4">

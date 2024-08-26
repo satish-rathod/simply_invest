@@ -8,6 +8,7 @@ const router = express.Router();
 router.post('/message', protect, async (req, res) => {
   try {
     const { message } = req.body;
+    console.log('User:', req.user); // Add this line
     const userId = req.user._id;
 
     console.log(`Received chat message from user ${userId}`);
