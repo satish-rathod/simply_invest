@@ -5,10 +5,13 @@ import scrapeData from './utils/scraper.js';
 import cron from 'node-cron';
 import cors from 'cors';
 
-// Import your routes
+// Import routes
 import authRoutes from './routes/authRoutes.js';
 import stockRoutes from './routes/stockRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import financeRoutes from './routes/financeRoutes.js';
+import newsRoutes from './routes/newsRoutes.js';
+
 
 dotenv.config();
 
@@ -17,6 +20,12 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -30,11 +39,21 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/news', newsRoutes);
+
+
+
+// 404 handler
+app.use((req, res) => {
+  console.log(`404 - Not Found: ${req.method} ${req.url}`);
+  res.status(404).send('404 - Not Found');
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('Error:', err.stack);
+  res.status(500).send('Internal Server Error');
 });
 
 // Run the scraper on server startup
