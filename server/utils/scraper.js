@@ -1,7 +1,7 @@
 // utils/scraper.js
 
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import StockRecommendation from '../models/StockRecommendation.js';
 import StockMarket from '../models/StockMarket.js';
 
