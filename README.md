@@ -140,61 +140,256 @@ Simply Invest is a comprehensive, multi-tenant financial investment platform bui
 └── README.md
 ```
 
-## How It Works
+## 🚀 Quick Start
 
-### Backend
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (v4.4 or higher)
+- npm or yarn package manager
 
-1. **Server Setup**: The `server.js` file sets up the Express server, connects to MongoDB, and defines the main routes.
+### Installation
 
-2. **Authentication**: 
-   - Users can register and login using the `/api/auth` routes.
-   - `authController.js` handles user registration and login logic.
-   - JWT tokens are used for maintaining user sessions.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd simply-invest
+   ```
 
-3. **Stock Data**:
-   - The `scraper.js` utility scrapes stock market data and recommendations daily.
-   - Scraped data is stored in MongoDB using the `StockRecommendation` and `StockMarket` models.
-   - `stockController.js` handles requests for stock data and recommendations.
+2. **Install dependencies**
+   ```bash
+   # Install server dependencies
+   cd server
+   npm install
+   
+   # Install client dependencies
+   cd ../client
+   yarn install
+   ```
 
-4. **AI Chatbot**:
-   - `chatRoutes.js` defines the endpoints for the chat functionality.
-   - `chatController.js` processes user messages and generates responses.
-   - `openai.js` utility integrates with the OpenAI API to generate intelligent responses.
+3. **Environment Setup**
+   
+   Create `.env` file in the server directory:
+   ```env
+   # Database
+   MONGO_URI=mongodb://localhost:27017/simply-invest
+   
+   # Authentication
+   JWT_SECRET=your_jwt_secret_here
+   
+   # External APIs (Optional)
+   OPENAI_API_KEY=your_openai_key_here
+   ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key_here
+   NEWS_API_KEY=your_news_api_key_here
+   
+   # Server Configuration
+   PORT=5000
+   NODE_ENV=development
+   ```
+   
+   Create `.env` file in the client directory:
+   ```env
+   REACT_APP_BACKEND_URL=http://localhost:5000
+   ```
 
-5. **Middleware**:
-   - `authMiddleware.js` protects routes that require authentication.
+4. **Database Setup**
+   ```bash
+   # Start MongoDB service
+   mongod
+   
+   # Run the seed script to create default tenant and admin user
+   cd server
+   node scripts/seedTenants.js
+   ```
 
-### Frontend
+5. **Start the application**
+   ```bash
+   # Start backend server (from server directory)
+   npm start
+   
+   # Start frontend client (from client directory)
+   yarn start
+   ```
 
-1. **App Structure**: `App.js` sets up the main structure of the React application and defines routes.
+6. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+   - Admin Panel: Use credentials from seed script
 
-2. **User Authentication**:
-   - `Register.js` and `Login.js` components handle user registration and login.
-   - Upon successful authentication, a JWT token is stored for maintaining the user session.
+### Default Admin Credentials
+After running the seed script, you can login with:
+- **Email**: admin@simplyinvest.com
+- **Password**: admin123
 
-3. **Stock Data Display**:
-   - Components (to be implemented) will fetch and display stock market data and recommendations from the backend API.
+## 🏢 Multi-Tenant Setup
 
-4. **Chat Interface**:
-   - A chat interface component (to be implemented) will allow users to interact with the AI chatbot.
-   - Messages are sent to the backend, processed, and responses are displayed to the user.
+### Creating a New Tenant
 
-## Data Flow
+1. **Login as Admin**
+   - Access the admin panel at `/admin`
+   - Use the default admin credentials
 
-1. The scraper runs daily to fetch the latest stock market data and recommendations.
-2. Users register or login to access the application.
-3. Authenticated users can view stock market data and recommendations fetched from the backend.
-4. Users can interact with the AI chatbot, sending messages through the chat interface.
-5. The backend processes these messages, using the OpenAI API to generate responses.
-6. The AI-generated responses are sent back to the frontend and displayed to the user.
+2. **Create Tenant**
+   - Click "Create Tenant" in the admin panel
+   - Fill in tenant details:
+     - Name, domain, subdomain
+     - Contact information
+     - Subscription plan
+     - Enabled features
 
-## Setup and Installation
+3. **Configure White-Label**
+   - Access white-label configuration
+   - Customize theme colors
+   - Upload logos and branding assets
+   - Configure SEO settings
+   - Enable/disable modules
 
-(Include steps for setting up the project, including environment variables, database setup, and running the application)
+### Tenant Access Methods
 
-## Future Enhancements
+Users can access tenant-specific instances through:
 
-- Real-time stock data updates using WebSockets
-- User portfolio management
-- Advanced stock analysis tools
-- Mobile app version
+1. **Subdomain**: `https://tenant.yourdomain.com`
+2. **Custom Domain**: `https://tenant-custom-domain.com`
+3. **Header-based**: Include `X-Tenant-ID` header in API requests
+4. **Query Parameter**: `?tenant=tenant-id`
+
+## 🔧 API Documentation
+
+### Authentication Endpoints
+```
+POST /api/auth/register     # User registration
+POST /api/auth/login        # User login
+GET  /api/auth/me          # Get current user
+```
+
+### Tenant Management
+```
+GET    /api/tenants                    # List all tenants
+POST   /api/tenants                    # Create new tenant
+GET    /api/tenants/:id                # Get tenant by ID
+PUT    /api/tenants/:id                # Update tenant
+DELETE /api/tenants/:id                # Delete tenant
+PUT    /api/tenants/:id/features       # Update tenant features
+PUT    /api/tenants/:id/maintenance    # Toggle maintenance mode
+GET    /api/tenants/:id/analytics      # Get tenant analytics
+```
+
+### White-Label Configuration
+```
+GET  /api/white-label/:tenantId           # Get configuration
+PUT  /api/white-label/:tenantId           # Update configuration
+PUT  /api/white-label/:tenantId/theme     # Update theme
+PUT  /api/white-label/:tenantId/branding  # Update branding
+PUT  /api/white-label/:tenantId/modules   # Update modules
+GET  /api/white-label/public/:domain      # Get public config
+```
+
+### Financial Data
+```
+GET  /api/portfolio           # Get user portfolio
+POST /api/portfolio/add       # Add investment
+GET  /api/stocks/:symbol      # Get stock data
+GET  /api/watchlists         # Get watchlists
+POST /api/alerts             # Create price alert
+```
+
+## 🎨 Customization Guide
+
+### Theme Customization
+Access the white-label configuration panel to customize:
+- **Primary Colors**: Main brand colors
+- **Typography**: Font families and sizes
+- **Layout**: Spacing and component styling
+- **Components**: Individual component theming
+
+### Feature Configuration
+Enable/disable features per tenant:
+- Portfolio Management
+- Social Trading
+- Educational Content
+- AI Financial Advisor
+- Advanced Analytics
+- Trading Integration
+
+### Branding Elements
+- Company logo and favicon
+- App name and tagline
+- Meta tags and SEO
+- Custom CSS/JavaScript
+- Email templates
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure token-based authentication
+- **Tenant Isolation**: Complete data separation
+- **Rate Limiting**: API request throttling
+- **Input Validation**: Comprehensive data validation
+- **CORS Protection**: Cross-origin request security
+- **Helmet Security**: HTTP headers protection
+
+## 📊 Monitoring & Analytics
+
+### Tenant Analytics
+- Monthly active users
+- Total page views
+- Session duration
+- Conversion rates
+- Revenue tracking
+
+### System Metrics
+- Server performance
+- Database optimization
+- API response times
+- Error tracking
+- User behavior analysis
+
+## 🌐 Deployment
+
+### Production Deployment
+1. Set up production MongoDB cluster
+2. Configure environment variables
+3. Build frontend for production
+4. Deploy using PM2 or Docker
+5. Set up reverse proxy (Nginx)
+6. Configure SSL certificates
+
+### Docker Deployment
+```dockerfile
+# Example Dockerfile structure
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 5000
+CMD ["npm", "start"]
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new features
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation wiki
+
+## 🚀 Future Roadmap
+
+- [ ] Mobile app development
+- [ ] Advanced backtesting engine
+- [ ] Cryptocurrency support
+- [ ] Options trading features
+- [ ] Advanced technical indicators
+- [ ] Machine learning predictions
+- [ ] API marketplace integration
+- [ ] Advanced reporting dashboard
