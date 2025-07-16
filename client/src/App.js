@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, MessageSquare, TrendingUp, Newspaper, Briefcase, Bell, List, BarChart3, Settings, User } from 'lucide-react';
+import { Home, MessageSquare, TrendingUp, Newspaper, Briefcase, Bell, List, BarChart3, Settings, User, Users, BookOpen } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import io from 'socket.io-client';
 
