@@ -30,3 +30,6 @@ export const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Not authorized, no token' });
     }
 };
+
+// Alternative export name for consistency
+export const authMiddleware = protect;
