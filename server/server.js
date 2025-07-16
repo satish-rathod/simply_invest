@@ -23,6 +23,8 @@ import alertRoutes from './routes/alertRoutes.js';
 import watchListRoutes from './routes/watchListRoutes.js';
 import realTimeRoutes from './routes/realTimeRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import socialRoutes from './routes/socialRoutes.js';
+import educationRoutes from './routes/educationRoutes.js';
 
 dotenv.config();
 
