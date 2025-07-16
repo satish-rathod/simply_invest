@@ -133,7 +133,7 @@ def test_authentication():
         print_error("Login failed")
         return False
     
-    if response.get('success') and response.get('token'):
+    if response.get('user') and response.get('token'):
         auth_token = response['token']
         print_success("Authentication successful")
         print_info(f"Token received: {auth_token[:20]}...")
