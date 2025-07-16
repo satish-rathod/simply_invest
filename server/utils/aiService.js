@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import { LlmChat, UserMessage } from 'emergentintegrations/llm/chat';
 import Sentiment from 'sentiment';
 import natural from 'natural';
 import { getStockDetails, getHistoricalData } from './marketData.js';
@@ -20,18 +19,34 @@ export const generateEnhancedChatResponse = async (userMessage, conversationHist
   try {
     // If we have a real API key, use the advanced AI service
     if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'sk-placeholder-key-add-real-key-here') {
-      const chat = new LlmChat(
-        process.env.OPENAI_API_KEY,
-        `financial_chat_${userId}`,
-        `You are an expert financial advisor and investment analyst. You provide personalized investment advice, market analysis, and financial insights. You have access to real-time market data and can analyze stocks, trends, and investment opportunities. Always provide practical, actionable advice while emphasizing the importance of diversification and risk management.`
-      );
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `You are an expert financial advisor and investment analyst. You provide personalized investment advice, market analysis, and financial insights. You have access to real-time market data and can analyze stocks, trends, and investment opportunities. Always provide practical, actionable advice while emphasizing the importance of diversification and risk management.`
+          },
+          ...conversationHistory.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'assistant',
+            content: msg.content
+          })),
+          {
+            role: "user",
+            content: userMessage
+          }
+        ];
 
-      chat.with_model('openai', process.env.OPENAI_MODEL || 'gpt-4o-mini');
+        const completion = await openai.chat.completions.create({
+          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.7
+        });
 
-      const message = new UserMessage(userMessage);
-      const response = await chat.send_message(message);
-      
-      return response;
+        return completion.choices[0].message.content;
+      } catch (openaiError) {
+        console.error('OpenAI API error:', openaiError);
+        return await generateBasicFinancialResponse(userMessage, conversationHistory);
+      }
     }
 
     // Fallback to basic analysis if no API key
