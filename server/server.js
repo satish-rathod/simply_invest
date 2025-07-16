@@ -129,6 +129,9 @@ app.use('/api/realtime', realTimeRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/education', educationRoutes);
+app.use('/api/tenants', tenantRoutes);
+app.use('/api/white-label', whiteLabelRoutes);
+app.use('/api/tenant-users', tenantUserRoutes);
 
 // 404 handler
 app.use((req, res) => {
