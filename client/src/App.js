@@ -121,6 +121,8 @@ const Sidebar = ({ user }) => {
         { icon: List, label: 'Watch Lists', path: '/watchlists', requiresAuth: true },
         { icon: Bell, label: 'Alerts', path: '/alerts', requiresAuth: true },
         { icon: BarChart3, label: 'Analytics', path: '/analytics', requiresAuth: true },
+        { icon: Users, label: 'Social', path: '/social', requiresAuth: true },
+        { icon: BookOpen, label: 'Education', path: '/education' },
         { icon: Newspaper, label: 'News', path: '/news' },
     ];
 
