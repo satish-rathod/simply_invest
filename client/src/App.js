@@ -100,6 +100,8 @@ const App = () => {
                             <Route path="/alerts" element={user ? <Alerts /> : <Login setUser={setUser} />} />
                             <Route path="/watchlists" element={user ? <WatchLists /> : <Login setUser={setUser} />} />
                             <Route path="/analytics" element={user ? <Analytics /> : <Login setUser={setUser} />} />
+                            <Route path="/social" element={user ? <SocialFeed /> : <Login setUser={setUser} />} />
+                            <Route path="/education" element={<Education />} />
                             <Route path="/settings" element={user ? <SettingsComponent /> : <Login setUser={setUser} />} />
                             <Route path="/" element={<Dashboard socket={socket} />} />
                         </Routes>
