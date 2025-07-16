@@ -25,6 +25,9 @@ import realTimeRoutes from './routes/realTimeRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import socialRoutes from './routes/socialRoutes.js';
 import educationRoutes from './routes/educationRoutes.js';
+import tenantRoutes from './routes/tenantRoutes.js';
+import whiteLabelRoutes from './routes/whiteLabelRoutes.js';
+import tenantUserRoutes from './routes/tenantUserRoutes.js';
 
 dotenv.config();
 
