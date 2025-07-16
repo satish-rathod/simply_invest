@@ -124,6 +124,8 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/watchlists', watchListRoutes);
 app.use('/api/realtime', realTimeRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/social', socialRoutes);
+app.use('/api/education', educationRoutes);
 
 // 404 handler
 app.use((req, res) => {
