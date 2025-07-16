@@ -1,69 +1,143 @@
-# Stock Market Insights and AI Advisor
+# Simply Invest - Multi-Tenant Financial Investment Platform
 
-## Project Overview
+## 🚀 Project Overview
 
-This MERN (MongoDB, Express, React, Node.js) stack application provides users with stock market data, recommendations, and an AI-powered chatbot for financial advice. The project aims to help users make informed decisions about their investments by providing up-to-date market information and personalized guidance.
+Simply Invest is a comprehensive, multi-tenant financial investment platform built with the MERN stack (MongoDB, Express.js, React, Node.js). The platform provides users with real-time stock market data, AI-powered financial advice, portfolio management, social trading features, and educational resources. With its advanced white-label solution and multi-tenant architecture, the platform can be deployed for multiple organizations with customizable branding and features.
 
-## Features
+## ✨ Key Features
 
-- User authentication (register/login)
-- Real-time stock market data
-- Daily stock recommendations
-- AI chatbot for financial advice
-- Responsive web design
+### 🏢 Multi-Tenant Architecture
+- **Tenant Isolation**: Complete data separation between tenants
+- **Subscription Management**: Flexible plans (Starter, Professional, Enterprise)
+- **User Management**: Role-based access control with permissions
+- **Resource Limits**: Configurable user and storage limits per tenant
+- **Maintenance Mode**: Tenant-specific maintenance capabilities
 
-## Technology Stack
+### 🎨 White-Label Solution
+- **Custom Branding**: Logo, colors, typography, and company information
+- **Theme Customization**: Complete UI theming with color schemes
+- **Module Configuration**: Enable/disable features per tenant
+- **SEO Optimization**: Custom meta tags, descriptions, and keywords
+- **Custom CSS/JS**: Advanced customization options
 
-### Frontend
-- React.js
-- React Router for navigation
-- Axios for API requests
+### 💼 Financial Features
+- **Portfolio Management**: Personal investment tracking with P&L analysis
+- **Real-time Market Data**: Live stock prices and market updates
+- **AI Financial Advisor**: OpenAI-powered investment guidance
+- **Stock Recommendations**: Daily curated investment suggestions
+- **Watchlists**: Monitor favorite stocks and assets
+- **Price Alerts**: Custom notifications for price movements
+
+### 📊 Advanced Analytics
+- **Performance Metrics**: Portfolio performance tracking
+- **Technical Analysis**: Charts and indicators
+- **Risk Assessment**: Investment risk evaluation
+- **Market Insights**: AI-powered market analysis
+- **Trading History**: Complete transaction tracking
+
+### 🌐 Social & Community
+- **Social Trading**: Follow and copy successful traders
+- **Investment Communities**: Join topic-specific groups
+- **Leaderboards**: Track top performers
+- **Discussion Forums**: Share insights and strategies
+- **User Profiles**: Professional investor profiles
+
+### 🎓 Educational Resources
+- **Learning Modules**: Structured investment courses
+- **Market Insights**: Daily market analysis and news
+- **Strategy Guides**: Investment strategy documentation
+- **Glossary**: Financial terms and definitions
+- **Video Tutorials**: Step-by-step learning content
+
+### 🔧 Technical Features
+- **PWA Support**: Progressive Web App capabilities
+- **Real-time Updates**: WebSocket-based live data
+- **Multi-language Support**: Internationalization (i18n)
+- **Automated Trading**: Integration with trading APIs
+- **Backtesting**: Strategy testing with historical data
+- **Push Notifications**: Real-time alerts and updates
+
+## 🏗️ Technology Stack
 
 ### Backend
-- Node.js with Express.js
-- MongoDB for data storage
-- Mongoose for object modeling
-- JSON Web Tokens (JWT) for authentication
-- OpenAI API for AI chatbot functionality
+- **Node.js** with Express.js framework
+- **MongoDB** with Mongoose ODM
+- **JWT Authentication** for secure sessions
+- **WebSocket** for real-time communication
+- **OpenAI API** for AI-powered features
+- **Cron Jobs** for scheduled tasks
+- **Rate Limiting** and security middleware
 
-### Data Scraping
-- Cheerio for web scraping
-- Axios for making HTTP requests
+### Frontend
+- **React.js** with modern hooks and context
+- **Tailwind CSS** for responsive design
+- **Framer Motion** for animations
+- **Recharts** for data visualization
+- **React Router** for navigation
+- **PWA** capabilities with service workers
 
-## Project Structure
+### Database Models
+- **Multi-tenant Models**: Tenant, WhiteLabelConfig, TenantUser
+- **User Management**: User, UserActivity, UserProgress
+- **Financial Data**: Portfolio, Trade, Alert, WatchList, MarketData
+- **Social Features**: Post, Comment, Following, Community
+- **Educational**: Course, Module, MarketInsight
+
+## 📁 Project Structure
 
 ```
-project-root/
-│
-├── frontend/
+/app/
+├── server/                     # Backend (Node.js/Express)
+│   ├── controllers/           # API controllers
+│   │   ├── tenantController.js
+│   │   ├── whiteLabelController.js
+│   │   ├── tenantUserController.js
+│   │   ├── authController.js
+│   │   ├── portfolioController.js
+│   │   ├── chatController.js
+│   │   └── ...
+│   ├── models/               # Database models
+│   │   ├── Tenant.js
+│   │   ├── WhiteLabelConfig.js
+│   │   ├── TenantUser.js
+│   │   ├── User.js
+│   │   ├── Portfolio.js
+│   │   └── ...
+│   ├── routes/               # API routes
+│   │   ├── tenantRoutes.js
+│   │   ├── whiteLabelRoutes.js
+│   │   ├── tenantUserRoutes.js
+│   │   └── ...
+│   ├── middleware/           # Custom middleware
+│   │   ├── tenantMiddleware.js
+│   │   ├── authMiddleware.js
+│   │   └── ...
+│   ├── utils/                # Utility functions
+│   │   ├── scraper.js
+│   │   ├── aiService.js
+│   │   ├── marketData.js
+│   │   └── ...
+│   ├── scripts/              # Utility scripts
+│   │   └── seedTenants.js
+│   └── server.js            # Main server file
+├── client/                   # Frontend (React)
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   │   ├── AdminPanel.js
+│   │   │   ├── WhiteLabelConfig.js
+│   │   │   ├── Portfolio.js
+│   │   │   ├── Analytics.js
+│   │   │   └── ...
+│   │   ├── i18n/           # Internationalization
+│   │   ├── utils/          # Utility functions
+│   │   ├── App.js          # Main app component
+│   │   └── index.js        # Entry point
 │   ├── public/
-│   └── src/
-│       ├── components/
-│       │   ├── Register.js
-│       │   └── Login.js
-│       ├── App.js
-│       └── index.js
-│
-└── backend/
-    ├── controllers/
-    │   ├── authController.js
-    │   ├── stockController.js
-    │   └── chatController.js
-    ├── models/
-    │   ├── User.js
-    │   ├── StockRecommendation.js
-    │   └── StockMarket.js
-    ├── routes/
-    │   ├── authRoutes.js
-    │   ├── stockRoutes.js
-    │   └── chatRoutes.js
-    ├── utils/
-    │   ├── scraper.js
-    │   ├── chatbot.js
-    │   └── openai.js
-    ├── middleware/
-    │   └── authMiddleware.js
-    └── server.js
+│   │   ├── manifest.json   # PWA manifest
+│   │   └── sw.js          # Service worker
+│   └── package.json
+├── supervisord.conf         # Process management
+└── README.md
 ```
 
 ## How It Works
