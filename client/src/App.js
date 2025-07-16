@@ -17,7 +17,7 @@ import Portfolio from './components/Portfolio';
 import Alerts from './components/Alerts';
 import WatchLists from './components/WatchLists';
 import Analytics from './components/Analytics';
-import Settings from './components/Settings';
+import SettingsComponent from './components/Settings';
 
 // Import assets
 import logoImage from './logo.png';
