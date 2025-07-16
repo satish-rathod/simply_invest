@@ -18,6 +18,8 @@ import Alerts from './components/Alerts';
 import WatchLists from './components/WatchLists';
 import Analytics from './components/Analytics';
 import SettingsComponent from './components/Settings';
+import SocialFeed from './components/SocialFeed';
+import Education from './components/Education';
 
 // Import assets
 import logoImage from './logo.png';
