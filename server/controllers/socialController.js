@@ -312,7 +312,9 @@ export const getTrendingPosts = async (req, res) => {
     // Add user info
     const postsWithUserInfo = await Promise.all(topPosts.map(async (post) => {
       const user = await User.findById(post.userId);
-      if (!user) return null; // Skip posts with deleted users
+
+      // Skip posts with deleted users - check before accessing user properties
+      if (!user) return null;
 
       return {
         ...post,
@@ -321,8 +323,8 @@ export const getTrendingPosts = async (req, res) => {
           name: user.name,
           email: user.email
         },
-        isUpvoted: post.upvotes?.includes(req.user.id) || false,
-        isDownvoted: post.downvotes?.includes(req.user.id) || false,
+        isUpvoted: post.upvotes?.includes(req.user?.id) || false,
+        isDownvoted: post.downvotes?.includes(req.user?.id) || false,
         upvotesCount: post.upvotes?.length || 0,
         downvotesCount: post.downvotes?.length || 0,
         score: post.calculatedScore,
