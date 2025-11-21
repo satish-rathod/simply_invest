@@ -13,14 +13,15 @@ const postSchema = new mongoose.Schema({
     ref: 'User'
   },
   content: { type: String, required: true },
-  type: { 
-    type: String, 
-    enum: ['INSIGHT', 'QUESTION', 'TRADE', 'ANALYSIS', 'NEWS'], 
-    default: 'INSIGHT' 
+  type: {
+    type: String,
+    enum: ['INSIGHT', 'QUESTION', 'TRADE', 'ANALYSIS', 'NEWS'],
+    default: 'INSIGHT'
   },
   symbol: { type: String }, // Associated stock symbol
   sentiment: { type: String, enum: ['BULLISH', 'BEARISH', 'NEUTRAL'], default: 'NEUTRAL' },
-  likes: [{ type: String }], // Array of user IDs who liked
+  upvotes: [{ type: String }], // Array of user IDs who upvoted
+  downvotes: [{ type: String }], // Array of user IDs who downvoted
   comments: [{
     id: { type: String, default: uuidv4 },
     userId: { type: String, required: true },
@@ -39,7 +40,7 @@ const postSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-postSchema.pre('save', function(next) {
+postSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });

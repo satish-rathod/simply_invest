@@ -19,9 +19,9 @@ const Education = () => {
   const fetchEducationData = async () => {
     try {
       const [coursesRes, insightsRes, progressRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/education/courses'),
-        axios.get('http://localhost:5000/api/education/insights'),
-        axios.get('http://localhost:5000/api/education/progress', {
+        axios.get('http://localhost:5001/api/education/courses'),
+        axios.get('http://localhost:5001/api/education/insights'),
+        axios.get('http://localhost:5001/api/education/progress', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }).catch(() => ({ data: null }))
       ]);
@@ -45,7 +45,7 @@ const Education = () => {
         return;
       }
 
-      await axios.post(`http://localhost:5000/api/education/courses/${courseId}/enroll`, {}, {
+      await axios.post(`http://localhost:5001/api/education/courses/${courseId}/enroll`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -116,11 +116,10 @@ const Education = () => {
       <div className="flex space-x-4 border-b border-gray-700">
         <button
           onClick={() => setActiveTab('courses')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'courses'
+          className={`pb-2 px-1 font-medium ${activeTab === 'courses'
               ? 'text-blue-400 border-b-2 border-blue-400'
               : 'text-gray-400 hover:text-white'
-          }`}
+            }`}
         >
           <div className="flex items-center space-x-2">
             <BookOpen className="w-4 h-4" />
@@ -129,11 +128,10 @@ const Education = () => {
         </button>
         <button
           onClick={() => setActiveTab('insights')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'insights'
+          className={`pb-2 px-1 font-medium ${activeTab === 'insights'
               ? 'text-blue-400 border-b-2 border-blue-400'
               : 'text-gray-400 hover:text-white'
-          }`}
+            }`}
         >
           <div className="flex items-center space-x-2">
             <TrendingUp className="w-4 h-4" />
@@ -142,11 +140,10 @@ const Education = () => {
         </button>
         <button
           onClick={() => setActiveTab('progress')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'progress'
+          className={`pb-2 px-1 font-medium ${activeTab === 'progress'
               ? 'text-blue-400 border-b-2 border-blue-400'
               : 'text-gray-400 hover:text-white'
-          }`}
+            }`}
         >
           <div className="flex items-center space-x-2">
             <Award className="w-4 h-4" />
@@ -172,10 +169,10 @@ const Education = () => {
                   {course.difficulty}
                 </span>
               </div>
-              
+
               <h3 className="text-lg font-semibold text-white mb-2">{course.title}</h3>
               <p className="text-gray-400 text-sm mb-4 line-clamp-2">{course.description}</p>
-              
+
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-4 text-sm text-gray-400">
                   <div className="flex items-center space-x-1">
@@ -247,10 +244,10 @@ const Education = () => {
                     <span className="text-gray-500">•</span>
                     <span className="text-sm text-gray-400">{insight.views} views</span>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-white mb-2">{insight.title}</h3>
                   <p className="text-gray-400 mb-4">{insight.summary}</p>
-                  
+
                   {insight.symbols.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {insight.symbols.map((symbol, index) => (
@@ -263,7 +260,7 @@ const Education = () => {
                       ))}
                     </div>
                   )}
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4 text-sm text-gray-400">
                       <span>By {insight.author}</span>

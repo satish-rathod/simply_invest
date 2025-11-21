@@ -20,10 +20,10 @@ const Analytics = () => {
     try {
       const token = localStorage.getItem('token');
       const [riskRes, performanceRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/analytics/portfolio-risk', {
+        axios.get('http://localhost:5001/api/analytics/portfolio-risk', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/analytics/performance', {
+        axios.get('http://localhost:5001/api/analytics/performance', {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -34,12 +34,12 @@ const Analytics = () => {
       // Fetch predictions for top holdings
       if (performanceRes.data.stockPerformance) {
         const topStocks = performanceRes.data.stockPerformance.slice(0, 5);
-        const predictionPromises = topStocks.map(stock => 
-          axios.get(`http://localhost:5000/api/analytics/prediction/${stock.symbol}`, {
+        const predictionPromises = topStocks.map(stock =>
+          axios.get(`http://localhost:5001/api/analytics/prediction/${stock.symbol}`, {
             headers: { Authorization: `Bearer ${token}` }
           }).catch(err => ({ data: null }))
         );
-        
+
         const predictionResults = await Promise.all(predictionPromises);
         setPredictions(predictionResults.filter(res => res.data).map(res => res.data));
       }
@@ -103,31 +103,28 @@ const Analytics = () => {
       <div className="flex space-x-4 border-b border-gray-700">
         <button
           onClick={() => setActiveTab('risk')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'risk'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'risk'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           Risk Analysis
         </button>
         <button
           onClick={() => setActiveTab('performance')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'performance'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'performance'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           Performance
         </button>
         <button
           onClick={() => setActiveTab('predictions')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'predictions'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'predictions'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           AI Predictions
         </button>
@@ -284,8 +281,8 @@ const Analytics = () => {
                     ${performance.totalReturn.toFixed(2)}
                   </p>
                 </div>
-                {performance.totalReturn >= 0 ? 
-                  <TrendingUp className="w-8 h-8 text-green-400" /> : 
+                {performance.totalReturn >= 0 ?
+                  <TrendingUp className="w-8 h-8 text-green-400" /> :
                   <TrendingDown className="w-8 h-8 text-red-400" />
                 }
               </div>
@@ -339,7 +336,7 @@ const Analytics = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="date" stroke="#9CA3AF" />
                   <YAxis stroke="#9CA3AF" />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#1F2937', border: 'none' }}
                     labelStyle={{ color: '#9CA3AF' }}
                   />
@@ -387,7 +384,7 @@ const Analytics = () => {
             className="bg-gray-800 rounded-lg p-6"
           >
             <h3 className="text-lg font-semibold text-white mb-4">AI Stock Predictions</h3>
-            
+
             {predictions.length === 0 ? (
               <div className="text-center py-12">
                 <Activity className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -411,24 +408,24 @@ const Analytics = () => {
                         <span className="font-medium capitalize">{prediction.prediction}</span>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Confidence:</span>
-                        <span className="text-white">{prediction.confidence.toFixed(1)}%</span>
+                        <span className="text-white">{prediction.confidence?.toFixed(1) || '0.0'}%</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Current Price:</span>
-                        <span className="text-white">${prediction.currentPrice.toFixed(2)}</span>
+                        <span className="text-white">${prediction.currentPrice?.toFixed(2) || '0.00'}</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Target Price:</span>
-                        <span className="text-white">${prediction.targetPrice.toFixed(2)}</span>
+                        <span className="text-white">${prediction.targetPrice?.toFixed(2) || '0.00'}</span>
                       </div>
                     </div>
-                    
+
                     <div className="mt-3 pt-3 border-t border-gray-600">
                       <p className="text-xs text-gray-400">{prediction.reasoning}</p>
                     </div>

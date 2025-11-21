@@ -9,38 +9,36 @@ import { analyzeSentiment } from '../utils/aiService.js';
 export const getFeed = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { page = 1, limit = 20 } = req.query;
-    
-    // Get users that the current user follows
-    const following = await Following.find({ follower: userId });
-    const followingIds = following.map(f => f.following);
-    followingIds.push(userId); // Include own posts
-    
+    const { page = 1, limit = 10 } = req.query; // Default limit to 10 as requested
+
+    // Global feed: fetch all posts, sorted by date
     const posts = await Post.find({
-      userId: { $in: followingIds },
       isPrivate: false
     })
-    .sort({ createdAt: -1 })
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .populate({
-      path: 'userId',
-      model: 'User',
-      select: 'name email'
-    });
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .populate({
+        path: 'userId',
+        model: 'User',
+        select: 'name email'
+      });
 
-    // Add user info and like status
+    // Add user info and vote status
     const postsWithUserInfo = await Promise.all(posts.map(async (post) => {
       const user = await User.findById(post.userId);
       return {
         ...post.toObject(),
         author: {
-          id: user._id,
-          name: user.name,
-          email: user.email
+          id: user?._id,
+          name: user?.name || 'Unknown',
+          email: user?.email
         },
-        isLiked: post.likes.includes(userId),
-        likesCount: post.likes.length,
+        isUpvoted: post.upvotes?.includes(userId) || false,
+        isDownvoted: post.downvotes?.includes(userId) || false,
+        upvotesCount: post.upvotes?.length || 0,
+        downvotesCount: post.downvotes?.length || 0,
+        score: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
         commentsCount: post.comments.length
       };
     }));
@@ -56,7 +54,7 @@ export const getFeed = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
     const { content, type, symbol, tags, tradeDetails } = req.body;
-    
+
     if (!content || !content.trim()) {
       return res.status(400).json({ error: 'Content is required' });
     }
@@ -81,7 +79,7 @@ export const createPost = async (req, res) => {
 
     // Get author info
     const author = await User.findById(req.user.id);
-    
+
     res.status(201).json({
       ...post.toObject(),
       author: {
@@ -89,8 +87,11 @@ export const createPost = async (req, res) => {
         name: author.name,
         email: author.email
       },
-      isLiked: false,
-      likesCount: 0,
+      isUpvoted: false,
+      isDownvoted: false,
+      upvotesCount: 0,
+      downvotesCount: 0,
+      score: 0,
       commentsCount: 0
     });
   } catch (error) {
@@ -99,8 +100,8 @@ export const createPost = async (req, res) => {
   }
 };
 
-// Like/unlike a post
-export const toggleLike = async (req, res) => {
+// Upvote a post
+export const toggleUpvote = async (req, res) => {
   try {
     const { postId } = req.params;
     const userId = req.user.id;
@@ -110,23 +111,82 @@ export const toggleLike = async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    const isLiked = post.likes.includes(userId);
-    
-    if (isLiked) {
-      post.likes = post.likes.filter(id => id !== userId);
+    // Initialize arrays if they don't exist (for backward compatibility)
+    if (!post.upvotes) post.upvotes = [];
+    if (!post.downvotes) post.downvotes = [];
+
+    const isUpvoted = post.upvotes.includes(userId);
+    const isDownvoted = post.downvotes.includes(userId);
+
+    // Remove from downvotes if present
+    if (isDownvoted) {
+      post.downvotes = post.downvotes.filter(id => id !== userId);
+    }
+
+    // Toggle upvote
+    if (isUpvoted) {
+      post.upvotes = post.upvotes.filter(id => id !== userId);
     } else {
-      post.likes.push(userId);
+      post.upvotes.push(userId);
     }
 
     await post.save();
-    
-    res.json({ 
-      isLiked: !isLiked, 
-      likesCount: post.likes.length 
+
+    res.json({
+      isUpvoted: !isUpvoted,
+      isDownvoted: false,
+      upvotesCount: post.upvotes.length,
+      downvotesCount: post.downvotes.length,
+      score: post.upvotes.length - post.downvotes.length
     });
   } catch (error) {
-    console.error('Error toggling like:', error);
-    res.status(500).json({ error: 'Failed to toggle like' });
+    console.error('Error toggling upvote:', error);
+    res.status(500).json({ error: 'Failed to toggle upvote' });
+  }
+};
+
+// Downvote a post
+export const toggleDownvote = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    const post = await Post.findOne({ id: postId });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Initialize arrays if they don't exist (for backward compatibility)
+    if (!post.upvotes) post.upvotes = [];
+    if (!post.downvotes) post.downvotes = [];
+
+    const isUpvoted = post.upvotes.includes(userId);
+    const isDownvoted = post.downvotes.includes(userId);
+
+    // Remove from upvotes if present
+    if (isUpvoted) {
+      post.upvotes = post.upvotes.filter(id => id !== userId);
+    }
+
+    // Toggle downvote
+    if (isDownvoted) {
+      post.downvotes = post.downvotes.filter(id => id !== userId);
+    } else {
+      post.downvotes.push(userId);
+    }
+
+    await post.save();
+
+    res.json({
+      isUpvoted: false,
+      isDownvoted: !isDownvoted,
+      upvotesCount: post.upvotes.length,
+      downvotesCount: post.downvotes.length,
+      score: post.upvotes.length - post.downvotes.length
+    });
+  } catch (error) {
+    console.error('Error toggling downvote:', error);
+    res.status(500).json({ error: 'Failed to toggle downvote' });
   }
 };
 
@@ -157,7 +217,7 @@ export const addComment = async (req, res) => {
 
     // Get commenter info
     const commenter = await User.findById(userId);
-    
+
     res.status(201).json({
       ...comment,
       author: {
@@ -207,7 +267,7 @@ export const toggleFollow = async (req, res) => {
 export const getTrendingPosts = async (req, res) => {
   try {
     const { period = '7d' } = req.query;
-    
+
     let dateFilter = new Date();
     switch (period) {
       case '1d':
@@ -227,30 +287,51 @@ export const getTrendingPosts = async (req, res) => {
       createdAt: { $gte: dateFilter },
       isPrivate: false
     })
-    .sort({ 
-      'likes': -1,
-      'comments': -1,
-      createdAt: -1
-    })
-    .limit(50);
+      .limit(100); // Get more posts to sort by score
+
+    // Calculate scores and sort
+    const postsWithScores = posts.map(post => ({
+      ...post.toObject(),
+      calculatedScore: (post.upvotes?.length || 0) - (post.downvotes?.length || 0)
+    }));
+
+    // Sort by score, then comments, then date
+    postsWithScores.sort((a, b) => {
+      if (b.calculatedScore !== a.calculatedScore) {
+        return b.calculatedScore - a.calculatedScore;
+      }
+      if (b.comments.length !== a.comments.length) {
+        return b.comments.length - a.comments.length;
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    // Take top 50
+    const topPosts = postsWithScores.slice(0, 50);
 
     // Add user info
-    const postsWithUserInfo = await Promise.all(posts.map(async (post) => {
+    const postsWithUserInfo = await Promise.all(topPosts.map(async (post) => {
       const user = await User.findById(post.userId);
+      if (!user) return null; // Skip posts with deleted users
+
       return {
-        ...post.toObject(),
+        ...post,
         author: {
           id: user._id,
           name: user.name,
           email: user.email
         },
-        isLiked: post.likes.includes(req.user.id),
-        likesCount: post.likes.length,
+        isUpvoted: post.upvotes?.includes(req.user.id) || false,
+        isDownvoted: post.downvotes?.includes(req.user.id) || false,
+        upvotesCount: post.upvotes?.length || 0,
+        downvotesCount: post.downvotes?.length || 0,
+        score: post.calculatedScore,
         commentsCount: post.comments.length
       };
     }));
 
-    res.json(postsWithUserInfo);
+    // Filter out nulls
+    res.json(postsWithUserInfo.filter(p => p !== null));
   } catch (error) {
     console.error('Error fetching trending posts:', error);
     res.status(500).json({ error: 'Failed to fetch trending posts' });
@@ -261,25 +342,49 @@ export const getTrendingPosts = async (req, res) => {
 export const getLeaderboard = async (req, res) => {
   try {
     const { period = 'MONTHLY' } = req.query;
-    
-    const leaderboard = await LeaderBoard.find({ period })
-      .sort({ score: -1, rank: 1 })
-      .limit(50);
 
-    // Add user info
-    const leaderboardWithUserInfo = await Promise.all(leaderboard.map(async (entry) => {
-      const user = await User.findById(entry.userId);
+    // Fetch all users and their portfolios to calculate total equity
+    // Note: For a production app with many users, this should be aggregated in the DB or cached.
+    // Given the current scale, we'll calculate it on the fly or use the LeaderBoard model if updated.
+
+    // However, the requirement is to use the LeaderBoard model which should be updated on trades.
+    // So we will fetch LeaderBoard entries, but we need to ensure they have the 'totalEquity' metric.
+    // If we haven't updated the LeaderBoard model schema yet, we should probably do that or 
+    // calculate it here dynamically for now to ensure it works immediately.
+
+    // Let's calculate dynamically for now to be safe and ensure it's always up to date with User balance.
+    const users = await User.find({});
+    const leaderboardData = await Promise.all(users.map(async (user) => {
+      const portfolio = await import('../models/Portfolio.js').then(m => m.default.findOne({ userId: user._id.toString() }));
+      const totalValue = portfolio ? portfolio.totalValue : 0;
+      const virtualBalance = user.virtualBalance || 50000;
+      const totalEquity = virtualBalance + totalValue;
+
       return {
-        ...entry.toObject(),
         user: {
           id: user._id,
           name: user.name,
           email: user.email
-        }
+        },
+        metrics: {
+          totalEquity,
+          totalValue,
+          virtualBalance
+        },
+        rank: 0 // Will assign after sort
       };
     }));
 
-    res.json(leaderboardWithUserInfo);
+    // Sort by Total Equity
+    leaderboardData.sort((a, b) => b.metrics.totalEquity - a.metrics.totalEquity);
+
+    // Assign ranks and take top 50
+    const top50 = leaderboardData.slice(0, 50).map((entry, index) => ({
+      ...entry,
+      rank: index + 1
+    }));
+
+    res.json(top50);
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });

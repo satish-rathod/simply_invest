@@ -15,7 +15,7 @@ const UserProfile = () => {
     const fetchProfileData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/auth/profile', {
+            const response = await axios.get('http://localhost:5001/api/auth/profile', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProfileData(response.data);
@@ -44,19 +44,19 @@ const UserProfile = () => {
     }
 
     return (
-        <motion.div 
+        <motion.div
             className="p-6 bg-gray-900 min-h-screen"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
         >
             <h1 className="text-3xl font-bold mb-6 text-white">User Profile</h1>
-            
+
             <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
                 <div className="flex items-center mb-6">
-                    <img 
-                        src={profileData.avatar || 'https://via.placeholder.com/150'} 
-                        alt="Profile" 
+                    <img
+                        src={profileData.avatar || 'https://via.placeholder.com/150'}
+                        alt="Profile"
                         className="w-24 h-24 rounded-full mr-6"
                     />
                     <div>
@@ -64,7 +64,7 @@ const UserProfile = () => {
                         <p className="text-gray-400">Financial Enthusiast</p>
                     </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <InfoItem icon={<User />} label="Username" value={profileData.username} />
                     <InfoItem icon={<Mail />} label="Email" value={profileData.email} />

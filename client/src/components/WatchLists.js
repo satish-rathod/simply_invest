@@ -30,7 +30,7 @@ const WatchLists = () => {
   const fetchWatchLists = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/watchlists', {
+      const response = await axios.get('http://localhost:5001/api/watchlists', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWatchLists(response.data);
@@ -48,7 +48,7 @@ const WatchLists = () => {
   const fetchWatchListData = async (watchListId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/watchlists/${watchListId}/prices`, {
+      const response = await axios.get(`http://localhost:5001/api/watchlists/${watchListId}/prices`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWatchListData(response.data);
@@ -62,10 +62,10 @@ const WatchLists = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/watchlists', watchListForm, {
+      const response = await axios.post('http://localhost:5001/api/watchlists', watchListForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success('Watch list created successfully');
       setShowCreateWatchList(false);
       setWatchListForm({ name: '', symbols: [] });
@@ -83,11 +83,11 @@ const WatchLists = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/watchlists/${selectedWatchList}/add-symbol`, 
+      await axios.post(`http://localhost:5001/api/watchlists/${selectedWatchList}/add-symbol`,
         { symbol: newSymbol.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success('Symbol added successfully');
       setShowAddSymbol(false);
       setNewSymbol('');
@@ -101,14 +101,14 @@ const WatchLists = () => {
 
   const handleRemoveSymbol = async (symbol) => {
     if (!selectedWatchList) return;
-    
+
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/watchlists/${selectedWatchList}/remove-symbol`, 
+      await axios.post(`http://localhost:5001/api/watchlists/${selectedWatchList}/remove-symbol`,
         { symbol },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success('Symbol removed successfully');
       fetchWatchLists();
       fetchWatchListData(selectedWatchList);
@@ -120,16 +120,16 @@ const WatchLists = () => {
 
   const handleDeleteWatchList = async (watchListId) => {
     if (!window.confirm('Are you sure you want to delete this watch list?')) return;
-    
+
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/watchlists/${watchListId}`, {
+      await axios.delete(`http://localhost:5001/api/watchlists/${watchListId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success('Watch list deleted successfully');
       fetchWatchLists();
-      
+
       // If we deleted the selected watch list, select another one
       if (selectedWatchList === watchListId) {
         const remaining = watchLists.filter(wl => wl.id !== watchListId);
@@ -175,7 +175,7 @@ const WatchLists = () => {
           className="bg-gray-800 rounded-lg p-4"
         >
           <h2 className="text-lg font-semibold text-white mb-4">My Watch Lists</h2>
-          
+
           {watchLists.length === 0 ? (
             <div className="text-center py-8">
               <List className="w-12 h-12 text-gray-400 mx-auto mb-2" />
@@ -188,11 +188,10 @@ const WatchLists = () => {
                 <motion.div
                   key={watchList.id}
                   whileHover={{ scale: 1.02 }}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                    selectedWatchList === watchList.id
+                  className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedWatchList === watchList.id
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                    }`}
                   onClick={() => setSelectedWatchList(watchList.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -265,15 +264,13 @@ const WatchLists = () => {
                           <td className="py-3 text-right text-white font-medium">
                             ${stock.price?.toFixed(2) || 'N/A'}
                           </td>
-                          <td className={`py-3 text-right ${
-                            stock.change >= 0 ? 'text-green-400' : 'text-red-400'
-                          }`}>
+                          <td className={`py-3 text-right ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
                             {stock.change >= 0 ? '+' : ''}
                             ${stock.change?.toFixed(2) || 'N/A'}
                           </td>
-                          <td className={`py-3 text-right ${
-                            stock.changePercent >= 0 ? 'text-green-400' : 'text-red-400'
-                          }`}>
+                          <td className={`py-3 text-right ${stock.changePercent >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
                             <div className="flex items-center justify-end space-x-1">
                               {stock.changePercent >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                               <span>
@@ -329,7 +326,7 @@ const WatchLists = () => {
               className="bg-gray-800 rounded-lg p-6 w-full max-w-md"
             >
               <h3 className="text-xl font-bold text-white mb-4">Create Watch List</h3>
-              
+
               <form onSubmit={handleCreateWatchList} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -338,13 +335,13 @@ const WatchLists = () => {
                   <input
                     type="text"
                     value={watchListForm.name}
-                    onChange={(e) => setWatchListForm({...watchListForm, name: e.target.value})}
+                    onChange={(e) => setWatchListForm({ ...watchListForm, name: e.target.value })}
                     className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g., Tech Stocks"
                     required
                   />
                 </div>
-                
+
                 <div className="flex space-x-4">
                   <button
                     type="submit"
@@ -377,7 +374,7 @@ const WatchLists = () => {
               className="bg-gray-800 rounded-lg p-6 w-full max-w-md"
             >
               <h3 className="text-xl font-bold text-white mb-4">Add Symbol</h3>
-              
+
               <form onSubmit={handleAddSymbol} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -392,7 +389,7 @@ const WatchLists = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="flex space-x-4">
                   <button
                     type="submit"

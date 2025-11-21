@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { registerServiceWorker, checkInstallPrompt } from './utils/pwa';
+import { registerServiceWorker } from './utils/pwa';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -17,7 +17,7 @@ root.render(
 // Register service worker for PWA
 registerServiceWorker();
 
-// Check for install prompt
-checkInstallPrompt();
+// Install prompt disabled
+// checkInstallPrompt();
 
 reportWebVitals();

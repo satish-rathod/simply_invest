@@ -12,6 +12,11 @@ const portfolioSchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
+  type: {
+    type: String,
+    enum: ['PERSONAL', 'VIRTUAL'],
+    default: 'PERSONAL'
+  },
   holdings: [{
     symbol: { type: String, required: true },
     quantity: { type: Number, required: true },
@@ -27,7 +32,7 @@ const portfolioSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-portfolioSchema.pre('save', function(next) {
+portfolioSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });

@@ -1,4 +1,5 @@
 import Portfolio from '../models/Portfolio.js';
+import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
 import MarketData from '../models/MarketData.js';
 import { getStockPrice } from '../utils/marketData.js';
@@ -6,7 +7,9 @@ import { getStockPrice } from '../utils/marketData.js';
 // Get user's portfolio
 export const getPortfolio = async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne({ userId: req.user.id });
+    const { type = 'PERSONAL' } = req.query;
+    const portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio not found' });
     }
@@ -24,7 +27,8 @@ export const getPortfolio = async (req, res) => {
 
     // Calculate portfolio totals
     portfolio.totalValue = portfolio.holdings.reduce((total, holding) => {
-      return total + (holding.currentPrice * holding.quantity);
+      const price = Number(holding.currentPrice) || 0;
+      return total + (price * holding.quantity);
     }, 0);
 
     portfolio.totalInvestment = portfolio.holdings.reduce((total, holding) => {
@@ -45,11 +49,13 @@ export const getPortfolio = async (req, res) => {
 // Create or update portfolio
 export const createPortfolio = async (req, res) => {
   try {
-    let portfolio = await Portfolio.findOne({ userId: req.user.id });
-    
+    const { type = 'PERSONAL' } = req.body;
+    let portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
     if (!portfolio) {
       portfolio = new Portfolio({
         userId: req.user.id,
+        type,
         holdings: [],
         totalValue: 0,
         totalInvestment: 0,
@@ -68,25 +74,57 @@ export const createPortfolio = async (req, res) => {
 // Add stock to portfolio
 export const addStock = async (req, res) => {
   try {
-    const { symbol, quantity, price } = req.body;
-    
-    if (!symbol || !quantity || !price) {
-      return res.status(400).json({ message: 'Symbol, quantity, and price are required' });
+    const { symbol, quantity, price, type = 'PERSONAL' } = req.body;
+
+    if (!symbol || !quantity) {
+      return res.status(400).json({ message: 'Symbol and quantity are required' });
     }
 
-    let portfolio = await Portfolio.findOne({ userId: req.user.id });
-    
+    if (type === 'PERSONAL' && !price) {
+      return res.status(400).json({ message: 'Price is required for personal portfolio' });
+    }
+
+    // Validate symbol against market data
+    const marketPrice = await getStockPrice(symbol);
+    if (!marketPrice || marketPrice === 0) {
+      return res.status(400).json({ message: `Invalid symbol: ${symbol}` });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    let executionPrice = price;
+
+    // Virtual Trading Logic
+    if (type === 'VIRTUAL') {
+      executionPrice = marketPrice; // Enforce market price
+      const totalCost = quantity * executionPrice;
+      const currentBalance = user.virtualBalance || 50000;
+
+      if (currentBalance < totalCost) {
+        return res.status(400).json({ message: `Insufficient funds. Balance: $${currentBalance.toFixed(2)}, Cost: $${totalCost.toFixed(2)}` });
+      }
+
+      // Deduct balance
+      user.virtualBalance = currentBalance - totalCost;
+      await user.save();
+    }
+
+    let portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
     if (!portfolio) {
-      portfolio = new Portfolio({ userId: req.user.id });
+      portfolio = new Portfolio({ userId: req.user.id, type });
     }
 
     // Check if stock already exists in portfolio
     const existingHolding = portfolio.holdings.find(h => h.symbol === symbol);
-    
+
     if (existingHolding) {
       // Update existing holding (average price calculation)
       const totalQuantity = existingHolding.quantity + quantity;
-      const totalValue = (existingHolding.averagePrice * existingHolding.quantity) + (price * quantity);
+      const totalValue = (existingHolding.averagePrice * existingHolding.quantity) + (executionPrice * quantity);
       existingHolding.averagePrice = totalValue / totalQuantity;
       existingHolding.quantity = totalQuantity;
       existingHolding.lastUpdated = Date.now();
@@ -95,12 +133,17 @@ export const addStock = async (req, res) => {
       portfolio.holdings.push({
         symbol,
         quantity,
-        averagePrice: price,
-        currentPrice: price,
+        averagePrice: executionPrice,
+        currentPrice: executionPrice,
         purchaseDate: Date.now(),
         lastUpdated: Date.now()
       });
     }
+
+    // Update portfolio totals
+    portfolio.totalValue = portfolio.holdings.reduce((total, holding) => {
+      return total + (holding.currentPrice || holding.averagePrice) * holding.quantity;
+    }, 0);
 
     // Create transaction record
     const transaction = new Transaction({
@@ -109,14 +152,14 @@ export const addStock = async (req, res) => {
       symbol,
       type: 'BUY',
       quantity,
-      price,
-      totalAmount: quantity * price
+      price: executionPrice,
+      totalAmount: quantity * executionPrice
     });
 
     await transaction.save();
     await portfolio.save();
 
-    res.status(201).json({ portfolio, transaction });
+    res.status(201).json({ portfolio, transaction, newBalance: user.virtualBalance });
   } catch (error) {
     console.error('Error adding stock:', error);
     res.status(500).json({ message: 'Server error' });
@@ -126,28 +169,51 @@ export const addStock = async (req, res) => {
 // Remove stock from portfolio
 export const removeStock = async (req, res) => {
   try {
-    const { symbol, quantity, price } = req.body;
-    
-    if (!symbol || !quantity || !price) {
-      return res.status(400).json({ message: 'Symbol, quantity, and price are required' });
+    const { symbol, quantity, price, type = 'PERSONAL' } = req.body;
+
+    if (!symbol || !quantity) {
+      return res.status(400).json({ message: 'Symbol and quantity are required' });
     }
 
-    const portfolio = await Portfolio.findOne({ userId: req.user.id });
-    
+    if (type === 'PERSONAL' && !price) {
+      return res.status(400).json({ message: 'Price is required for personal portfolio' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio not found' });
     }
 
     const holdingIndex = portfolio.holdings.findIndex(h => h.symbol === symbol);
-    
+
     if (holdingIndex === -1) {
       return res.status(404).json({ message: 'Stock not found in portfolio' });
     }
 
     const holding = portfolio.holdings[holdingIndex];
-    
+
     if (holding.quantity < quantity) {
       return res.status(400).json({ message: 'Insufficient quantity to sell' });
+    }
+
+    let executionPrice = price;
+
+    // Virtual Trading Logic
+    if (type === 'VIRTUAL') {
+      const marketPrice = await getStockPrice(symbol);
+      executionPrice = marketPrice; // Enforce market price
+
+      const totalSale = quantity * executionPrice;
+
+      // Add to balance
+      user.virtualBalance = (user.virtualBalance || 50000) + totalSale;
+      await user.save();
     }
 
     if (holding.quantity === quantity) {
@@ -159,6 +225,11 @@ export const removeStock = async (req, res) => {
       holding.lastUpdated = Date.now();
     }
 
+    // Update portfolio totals
+    portfolio.totalValue = portfolio.holdings.reduce((total, holding) => {
+      return total + (holding.currentPrice || holding.averagePrice) * holding.quantity;
+    }, 0);
+
     // Create transaction record
     const transaction = new Transaction({
       userId: req.user.id,
@@ -166,14 +237,14 @@ export const removeStock = async (req, res) => {
       symbol,
       type: 'SELL',
       quantity,
-      price,
-      totalAmount: quantity * price
+      price: executionPrice,
+      totalAmount: quantity * executionPrice
     });
 
     await transaction.save();
     await portfolio.save();
 
-    res.json({ portfolio, transaction });
+    res.json({ portfolio, transaction, newBalance: user.virtualBalance });
   } catch (error) {
     console.error('Error removing stock:', error);
     res.status(500).json({ message: 'Server error' });
@@ -183,15 +254,20 @@ export const removeStock = async (req, res) => {
 // Get portfolio performance
 export const getPortfolioPerformance = async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne({ userId: req.user.id });
-    const transactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    
+    const { type = 'PERSONAL' } = req.query;
+    const portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio not found' });
     }
 
+    const transactions = await Transaction.find({
+      userId: req.user.id,
+      portfolioId: portfolio.id
+    }).sort({ createdAt: -1 });
+
     // Calculate performance metrics
-    const totalGainLossPercent = portfolio.totalInvestment > 0 ? 
+    const totalGainLossPercent = portfolio.totalInvestment > 0 ?
       (portfolio.totalGainLoss / portfolio.totalInvestment) * 100 : 0;
 
     const performance = {
@@ -221,10 +297,22 @@ export const getPortfolioPerformance = async (req, res) => {
 // Get transactions
 export const getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find({ userId: req.user.id })
+    const { type = 'PERSONAL' } = req.query;
+
+    // First find the portfolio to get its ID
+    const portfolio = await Portfolio.findOne({ userId: req.user.id, type });
+
+    if (!portfolio) {
+      return res.json([]); // Return empty array if portfolio doesn't exist yet
+    }
+
+    const transactions = await Transaction.find({
+      userId: req.user.id,
+      portfolioId: portfolio.id
+    })
       .sort({ createdAt: -1 })
       .limit(50);
-    
+
     res.json(transactions);
   } catch (error) {
     console.error('Error fetching transactions:', error);

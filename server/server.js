@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import scrapeData from './utils/scraper.js';
 import cron from 'node-cron';
 import cors from 'cors';
@@ -28,8 +30,7 @@ import educationRoutes from './routes/educationRoutes.js';
 import tenantRoutes from './routes/tenantRoutes.js';
 import whiteLabelRoutes from './routes/whiteLabelRoutes.js';
 import tenantUserRoutes from './routes/tenantUserRoutes.js';
-
-dotenv.config();
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 const app = express();
 
@@ -40,7 +41,7 @@ app.use(compression());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
@@ -54,6 +55,21 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Request timeout middleware - prevent hanging requests
+app.use((req, res, next) => {
+  // Set timeout to 30 seconds for all requests
+  req.setTimeout(30000, () => {
+    console.error(`Request timeout: ${req.method} ${req.url}`);
+    res.status(408).json({ error: 'Request timeout' });
+  });
+
+  res.setTimeout(30000, () => {
+    console.error(`Response timeout: ${req.method} ${req.url}`);
+  });
+
+  next();
+});
+
 // Create HTTP server and Socket.IO instance
 const server = createServer(app);
 const io = new Server(server, {
@@ -66,7 +82,7 @@ const io = new Server(server, {
 // Socket.IO for real-time updates
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
-  
+
   // Join room for authenticated users
   socket.on('join-user', (userId) => {
     socket.join(`user-${userId}`);
@@ -101,20 +117,42 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
+// MongoDB Connection with connection pool configuration
+mongoose.connect(process.env.MONGO_URI, {
+  maxPoolSize: 10, // Limit maximum concurrent connections
+  minPoolSize: 2,  // Maintain minimum connections for performance
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+  family: 4 // Use IPv4, skip trying IPv6
+})
+  .then(() => {
+    console.log('MongoDB Connected');
+    console.log('Connection pool configured: maxPoolSize=10, minPoolSize=2');
+  })
   .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
+
+// Monitor MongoDB connection events
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected. Attempting to reconnect...');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('MongoDB reconnected');
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -132,6 +170,7 @@ app.use('/api/education', educationRoutes);
 app.use('/api/tenants', tenantRoutes);
 app.use('/api/white-label', whiteLabelRoutes);
 app.use('/api/tenant-users', tenantUserRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -142,7 +181,7 @@ app.use((req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   });
@@ -152,7 +191,7 @@ app.use((err, req, res, next) => {
 const broadcastStockUpdates = async () => {
   try {
     const popularStocks = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'];
-    
+
     for (const symbol of popularStocks) {
       try {
         const price = await getStockPrice(symbol);

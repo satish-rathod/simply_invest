@@ -17,7 +17,7 @@ export const getAlerts = async (req, res) => {
 export const createAlert = async (req, res) => {
   try {
     const { symbol, type, targetValue } = req.body;
-    
+
     if (!symbol || !type || !targetValue) {
       return res.status(400).json({ message: 'Symbol, type, and target value are required' });
     }
@@ -45,7 +45,7 @@ export const updateAlert = async (req, res) => {
     const { isActive, targetValue } = req.body;
 
     const alert = await Alert.findOne({ id, userId: req.user.id });
-    
+
     if (!alert) {
       return res.status(404).json({ message: 'Alert not found' });
     }
@@ -65,9 +65,9 @@ export const updateAlert = async (req, res) => {
 export const deleteAlert = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const alert = await Alert.findOneAndDelete({ id, userId: req.user.id });
-    
+
     if (!alert) {
       return res.status(404).json({ message: 'Alert not found' });
     }
@@ -82,12 +82,14 @@ export const deleteAlert = async (req, res) => {
 // Check and process alerts (called by scheduler)
 export const checkAlerts = async () => {
   try {
-    const activeAlerts = await Alert.find({ isActive: true, isTriggered: false });
-    
+    // Limit query to prevent large data loads
+    const activeAlerts = await Alert.find({ isActive: true, isTriggered: false })
+      .limit(100); // Limit to 100 alerts per check
+
     for (const alert of activeAlerts) {
       try {
         let currentValue;
-        
+
         switch (alert.type) {
           case 'PRICE_ABOVE':
           case 'PRICE_BELOW':
@@ -106,7 +108,7 @@ export const checkAlerts = async () => {
         }
 
         alert.currentValue = currentValue;
-        
+
         let triggered = false;
         let message = '';
 
@@ -129,7 +131,7 @@ export const checkAlerts = async () => {
             // Get user email for notification
             const User = (await import('../models/User.js')).default;
             const user = await User.findById(alert.userId);
-            
+
             if (user && user.email) {
               await sendEmail(user.email, 'Price Alert Triggered', message);
             }

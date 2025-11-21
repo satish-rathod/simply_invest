@@ -14,7 +14,7 @@ const NewsSection = () => {
 
     const fetchNews = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/news/financial');
+            const response = await axios.get('http://localhost:5001/api/news/financial');
             setNews(response.data);
             setLoading(false);
         } catch (error) {
@@ -41,7 +41,7 @@ const NewsSection = () => {
     }
 
     return (
-        <motion.div 
+        <motion.div
             className="p-6 bg-gray-900"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -50,7 +50,7 @@ const NewsSection = () => {
             <h2 className="text-3xl font-bold mb-6 text-white">Financial News</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {news.map((article, index) => (
-                    <motion.div 
+                    <motion.div
                         key={index}
                         className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
                         initial={{ opacity: 0, y: 50 }}
@@ -58,9 +58,9 @@ const NewsSection = () => {
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
                         {article.urlToImage && (
-                            <img 
-                                src={article.urlToImage} 
-                                alt={article.title} 
+                            <img
+                                src={article.urlToImage}
+                                alt={article.title}
                                 className="w-full h-48 object-cover"
                             />
                         )}
@@ -73,9 +73,9 @@ const NewsSection = () => {
                                 <Clock size={16} className="ml-4 mr-2" />
                                 <span>{new Date(article.publishedAt).toLocaleTimeString()}</span>
                             </div>
-                            <a 
-                                href={article.url} 
-                                target="_blank" 
+                            <a
+                                href={article.url}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
                             >

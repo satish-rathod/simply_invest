@@ -3,7 +3,8 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 import {
   getFeed,
   createPost,
-  toggleLike,
+  toggleUpvote,
+  toggleDownvote,
   addComment,
   toggleFollow,
   getTrendingPosts,
@@ -20,7 +21,8 @@ router.use(authMiddleware);
 router.get('/feed', getFeed);
 router.get('/trending', getTrendingPosts);
 router.post('/posts', createPost);
-router.post('/posts/:postId/like', toggleLike);
+router.post('/posts/:postId/upvote', toggleUpvote);
+router.post('/posts/:postId/downvote', toggleDownvote);
 router.post('/posts/:postId/comments', addComment);
 
 // Follow system

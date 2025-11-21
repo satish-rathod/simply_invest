@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Heart, MessageCircle, Share2, TrendingUp, Users, Trophy, Filter } from 'lucide-react';
+import { Plus, ThumbsUp, ThumbsDown, MessageCircle, Share2, TrendingUp, Users, Trophy, Filter } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -27,13 +27,13 @@ const SocialFeed = () => {
     try {
       const token = localStorage.getItem('token');
       const [feedRes, trendingRes, leaderboardRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/social/feed', {
+        axios.get('http://localhost:5001/api/social/feed', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/social/trending', {
+        axios.get('http://localhost:5001/api/social/trending', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/social/leaderboard', {
+        axios.get('http://localhost:5001/api/social/leaderboard', {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -55,7 +55,7 @@ const SocialFeed = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/social/posts', newPost, {
+      const response = await axios.post('http://localhost:5001/api/social/posts', newPost, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -69,21 +69,53 @@ const SocialFeed = () => {
     }
   };
 
-  const handleLike = async (postId) => {
+  const handleUpvote = async (postId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:5000/api/social/posts/${postId}/like`, {}, {
+      const response = await axios.post(`http://localhost:5001/api/social/posts/${postId}/upvote`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setPosts(posts.map(post => 
-        post.id === postId 
-          ? { ...post, isLiked: response.data.isLiked, likesCount: response.data.likesCount }
+      setPosts(posts.map(post =>
+        post.id === postId
+          ? {
+            ...post,
+            isUpvoted: response.data.isUpvoted,
+            isDownvoted: response.data.isDownvoted,
+            upvotesCount: response.data.upvotesCount,
+            downvotesCount: response.data.downvotesCount,
+            score: response.data.score
+          }
           : post
       ));
     } catch (error) {
-      console.error('Error toggling like:', error);
-      toast.error('Failed to like post');
+      console.error('Error toggling upvote:', error);
+      toast.error('Failed to upvote post');
+    }
+  };
+
+  const handleDownvote = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`http://localhost:5001/api/social/posts/${postId}/downvote`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setPosts(posts.map(post =>
+        post.id === postId
+          ? {
+            ...post,
+            isUpvoted: response.data.isUpvoted,
+            isDownvoted: response.data.isDownvoted,
+            upvotesCount: response.data.upvotesCount,
+            downvotesCount: response.data.downvotesCount,
+            score: response.data.score
+          }
+          : post
+      ));
+    } catch (error) {
+      console.error('Error toggling downvote:', error);
+      toast.error('Failed to downvote post');
     }
   };
 
@@ -135,11 +167,10 @@ const SocialFeed = () => {
       <div className="flex space-x-4 border-b border-gray-700">
         <button
           onClick={() => setActiveTab('feed')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'feed'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'feed'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <div className="flex items-center space-x-2">
             <Users className="w-4 h-4" />
@@ -148,11 +179,10 @@ const SocialFeed = () => {
         </button>
         <button
           onClick={() => setActiveTab('trending')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'trending'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'trending'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <div className="flex items-center space-x-2">
             <TrendingUp className="w-4 h-4" />
@@ -161,11 +191,10 @@ const SocialFeed = () => {
         </button>
         <button
           onClick={() => setActiveTab('leaderboard')}
-          className={`pb-2 px-1 font-medium ${
-            activeTab === 'leaderboard'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-2 px-1 font-medium ${activeTab === 'leaderboard'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <div className="flex items-center space-x-2">
             <Trophy className="w-4 h-4" />
@@ -217,7 +246,7 @@ const SocialFeed = () => {
                     )}
                   </div>
                   <p className="text-gray-300 mb-4">{post.content}</p>
-                  
+
                   {post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {post.tags.map((tag, index) => (
@@ -230,22 +259,34 @@ const SocialFeed = () => {
                       ))}
                     </div>
                   )}
-                  
+
                   <div className="flex items-center space-x-6 text-gray-400">
-                    <button
-                      onClick={() => handleLike(post.id)}
-                      className={`flex items-center space-x-2 hover:text-red-400 transition-colors ${
-                        post.isLiked ? 'text-red-400' : ''
-                      }`}
-                    >
-                      <Heart className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} />
-                      <span>{post.likesCount}</span>
-                    </button>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => handleUpvote(post.id)}
+                        className={`flex items-center space-x-1 hover:text-green-400 transition-colors ${post.isUpvoted ? 'text-green-400' : ''
+                          }`}
+                      >
+                        <ThumbsUp className={`w-4 h-4 ${post.isUpvoted ? 'fill-current' : ''}`} />
+                        <span>{post.upvotesCount || 0}</span>
+                      </button>
+                      <span className={`font-medium ${post.score > 0 ? 'text-green-400' : post.score < 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                        {post.score || 0}
+                      </span>
+                      <button
+                        onClick={() => handleDownvote(post.id)}
+                        className={`flex items-center space-x-1 hover:text-red-400 transition-colors ${post.isDownvoted ? 'text-red-400' : ''
+                          }`}
+                      >
+                        <ThumbsDown className={`w-4 h-4 ${post.isDownvoted ? 'fill-current' : ''}`} />
+                        <span>{post.downvotesCount || 0}</span>
+                      </button>
+                    </div>
                     <button className="flex items-center space-x-2 hover:text-blue-400 transition-colors">
                       <MessageCircle className="w-4 h-4" />
                       <span>{post.commentsCount}</span>
                     </button>
-                    <button className="flex items-center space-x-2 hover:text-green-400 transition-colors">
+                    <button className="flex items-center space-x-2 hover:text-gray-300 transition-colors">
                       <Share2 className="w-4 h-4" />
                       <span>Share</span>
                     </button>
@@ -282,10 +323,19 @@ const SocialFeed = () => {
                   </div>
                   <p className="text-gray-300 mb-4">{post.content}</p>
                   <div className="flex items-center space-x-6 text-gray-400">
-                    <span className="flex items-center space-x-2">
-                      <Heart className="w-4 h-4" />
-                      <span>{post.likesCount}</span>
-                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="flex items-center space-x-1 text-green-400">
+                        <ThumbsUp className="w-4 h-4" />
+                        <span>{post.upvotesCount || 0}</span>
+                      </span>
+                      <span className={`font-medium ${post.score > 0 ? 'text-green-400' : post.score < 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                        {post.score || 0}
+                      </span>
+                      <span className="flex items-center space-x-1 text-red-400">
+                        <ThumbsDown className="w-4 h-4" />
+                        <span>{post.downvotesCount || 0}</span>
+                      </span>
+                    </div>
                     <span className="flex items-center space-x-2">
                       <MessageCircle className="w-4 h-4" />
                       <span>{post.commentsCount}</span>
@@ -304,21 +354,20 @@ const SocialFeed = () => {
           <div className="space-y-4">
             {leaderboard.map((entry, index) => (
               <div key={entry.id} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-colors">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                  index === 0 ? 'bg-yellow-500 text-black' :
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index === 0 ? 'bg-yellow-500 text-black' :
                   index === 1 ? 'bg-gray-400 text-black' :
-                  index === 2 ? 'bg-amber-600 text-black' :
-                  'bg-gray-600 text-white'
-                }`}>
+                    index === 2 ? 'bg-amber-600 text-black' :
+                      'bg-gray-600 text-white'
+                  }`}>
                   {index + 1}
                 </div>
                 <div className="flex-1">
                   <p className="text-white font-medium">{entry.user.name}</p>
-                  <p className="text-gray-400 text-sm">Score: {entry.metrics.score}</p>
+                  <p className="text-gray-400 text-sm">Equity: ${entry.metrics.totalEquity?.toFixed(2)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-green-400 font-medium">{entry.metrics.returnPercentage}%</p>
-                  <p className="text-gray-400 text-sm">{entry.metrics.followers} followers</p>
+                  <p className="text-gray-400 text-sm">Score: {entry.metrics.score}</p>
                 </div>
               </div>
             ))}
@@ -335,7 +384,7 @@ const SocialFeed = () => {
             className="bg-gray-800 rounded-lg p-6 w-full max-w-md"
           >
             <h3 className="text-xl font-bold text-white mb-4">Create Post</h3>
-            
+
             <form onSubmit={handleCreatePost} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -343,7 +392,7 @@ const SocialFeed = () => {
                 </label>
                 <select
                   value={newPost.type}
-                  onChange={(e) => setNewPost({...newPost, type: e.target.value})}
+                  onChange={(e) => setNewPost({ ...newPost, type: e.target.value })}
                   className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="INSIGHT">Insight</option>
@@ -361,25 +410,25 @@ const SocialFeed = () => {
                 <input
                   type="text"
                   value={newPost.symbol}
-                  onChange={(e) => setNewPost({...newPost, symbol: e.target.value.toUpperCase()})}
+                  onChange={(e) => setNewPost({ ...newPost, symbol: e.target.value.toUpperCase() })}
                   className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., AAPL"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Content
                 </label>
                 <textarea
                   value={newPost.content}
-                  onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                   className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
                   placeholder="Share your thoughts, analysis, or insights..."
                   required
                 />
               </div>
-              
+
               <div className="flex space-x-4">
                 <button
                   type="submit"

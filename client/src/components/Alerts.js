@@ -21,7 +21,7 @@ const Alerts = () => {
   const fetchAlerts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/alerts', {
+      const response = await axios.get('http://localhost:5001/api/alerts', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAlerts(response.data);
@@ -37,10 +37,10 @@ const Alerts = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/alerts', alertForm, {
+      await axios.post('http://localhost:5001/api/alerts', alertForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success('Alert created successfully');
       setShowCreateAlert(false);
       setAlertForm({ symbol: '', type: 'PRICE_ABOVE', targetValue: '' });
@@ -54,11 +54,11 @@ const Alerts = () => {
   const handleToggleAlert = async (id, isActive) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/alerts/${id}`, 
-        { isActive: !isActive }, 
+      await axios.put(`http://localhost:5001/api/alerts/${id}`,
+        { isActive: !isActive },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success(isActive ? 'Alert deactivated' : 'Alert activated');
       fetchAlerts();
     } catch (error) {
@@ -69,13 +69,13 @@ const Alerts = () => {
 
   const handleDeleteAlert = async (id) => {
     if (!window.confirm('Are you sure you want to delete this alert?')) return;
-    
+
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/alerts/${id}`, {
+      await axios.delete(`http://localhost:5001/api/alerts/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success('Alert deleted successfully');
       fetchAlerts();
     } catch (error) {
@@ -214,7 +214,7 @@ const Alerts = () => {
         className="bg-gray-800 rounded-lg p-6"
       >
         <h2 className="text-xl font-bold text-white mb-4">My Alerts</h2>
-        
+
         {alerts.length === 0 ? (
           <div className="text-center py-12">
             <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -228,13 +228,12 @@ const Alerts = () => {
                 key={alert.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`p-4 rounded-lg border-l-4 ${
-                  alert.isTriggered 
-                    ? 'bg-yellow-900 border-yellow-400' 
-                    : alert.isActive 
-                      ? 'bg-gray-700 border-green-400' 
+                className={`p-4 rounded-lg border-l-4 ${alert.isTriggered
+                    ? 'bg-yellow-900 border-yellow-400'
+                    : alert.isActive
+                      ? 'bg-gray-700 border-green-400'
                       : 'bg-gray-700 border-gray-500'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -260,15 +259,14 @@ const Alerts = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleToggleAlert(alert.id, alert.isActive)}
-                      className={`p-2 rounded-lg ${
-                        alert.isActive 
-                          ? 'text-green-400 hover:bg-green-900' 
+                      className={`p-2 rounded-lg ${alert.isActive
+                          ? 'text-green-400 hover:bg-green-900'
                           : 'text-gray-400 hover:bg-gray-600'
-                      }`}
+                        }`}
                     >
                       {alert.isActive ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                     </button>
@@ -297,7 +295,7 @@ const Alerts = () => {
               className="bg-gray-800 rounded-lg p-6 w-full max-w-md"
             >
               <h3 className="text-xl font-bold text-white mb-4">Create Price Alert</h3>
-              
+
               <form onSubmit={handleCreateAlert} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -306,20 +304,20 @@ const Alerts = () => {
                   <input
                     type="text"
                     value={alertForm.symbol}
-                    onChange={(e) => setAlertForm({...alertForm, symbol: e.target.value.toUpperCase()})}
+                    onChange={(e) => setAlertForm({ ...alertForm, symbol: e.target.value.toUpperCase() })}
                     className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g., AAPL"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     Alert Type
                   </label>
                   <select
                     value={alertForm.type}
-                    onChange={(e) => setAlertForm({...alertForm, type: e.target.value})}
+                    onChange={(e) => setAlertForm({ ...alertForm, type: e.target.value })}
                     className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="PRICE_ABOVE">Price Above</option>
@@ -328,7 +326,7 @@ const Alerts = () => {
                     <option value="NEWS_MENTION">News Mention</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     Target Value
@@ -337,14 +335,14 @@ const Alerts = () => {
                     type="number"
                     step="0.01"
                     value={alertForm.targetValue}
-                    onChange={(e) => setAlertForm({...alertForm, targetValue: e.target.value})}
+                    onChange={(e) => setAlertForm({ ...alertForm, targetValue: e.target.value })}
                     className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Target price or threshold"
                     min="0.01"
                     required
                   />
                 </div>
-                
+
                 <div className="flex space-x-4">
                   <button
                     type="submit"
