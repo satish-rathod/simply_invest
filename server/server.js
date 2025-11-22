@@ -31,6 +31,8 @@ import tenantRoutes from './routes/tenantRoutes.js';
 import whiteLabelRoutes from './routes/whiteLabelRoutes.js';
 import tenantUserRoutes from './routes/tenantUserRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import publicRoutes from './routes/publicRoutes.js';
+
 
 const app = express();
 
@@ -155,7 +157,9 @@ mongoose.connection.on('reconnected', () => {
 });
 
 // Routes
+app.use('/api/public', publicRoutes);
 app.use('/api/auth', authRoutes);
+
 app.use('/api/stocks', stockRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/finance', financeRoutes);

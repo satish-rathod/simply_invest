@@ -22,6 +22,7 @@ import SocialFeed from './components/SocialFeed';
 import Education from './components/Education';
 import VirtualTrading from './components/VirtualTrading';
 import ErrorBoundary from './components/ErrorBoundary';
+import LandingPage from './components/LandingPage';
 
 // Import assets
 import logoImage from './logo.png';
@@ -76,44 +77,54 @@ const App = () => {
     return (
         <Router>
             <ErrorBoundary>
-                <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
-                    <Toaster
-                        position="top-right"
-                        toastOptions={{
-                            className: 'bg-gray-800 text-white',
-                            duration: 4000,
-                        }}
-                    />
+                <Routes>
+                    {/* Public routes without sidebar/header */}
+                    <Route path="/" element={user ? <AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><Dashboard socket={socket} /></AppLayout> : <LandingPage />} />
+                    <Route path="/register" element={user ? <AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><Dashboard socket={socket} /></AppLayout> : <Register setUser={setUser} />} />
+                    <Route path="/login" element={user ? <AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><Dashboard socket={socket} /></AppLayout> : <Login setUser={setUser} />} />
 
-                    <Sidebar user={user} />
-
-                    <div className="flex flex-col flex-1 border-l border-gray-700">
-                        <Header user={user} onLogout={handleLogout} notifications={notifications} />
-
-                        <main className="flex-1 overflow-auto bg-gray-900">
-                            <Routes>
-                                <Route path="/register" element={<Register setUser={setUser} />} />
-                                <Route path="/login" element={<Login setUser={setUser} />} />
-                                <Route path="/dashboard" element={<Dashboard socket={socket} />} />
-                                <Route path="/chat" element={<ChatInterface />} />
-                                <Route path="/profile" element={user ? <UserProfile user={user} /> : <Login setUser={setUser} />} />
-                                <Route path="/market-overview" element={<MarketOverview socket={socket} />} />
-                                <Route path="/news" element={<NewsSection />} />
-                                <Route path="/portfolio" element={user ? <Portfolio /> : <Login setUser={setUser} />} />
-                                <Route path="/alerts" element={user ? <Alerts /> : <Login setUser={setUser} />} />
-                                <Route path="/watchlists" element={user ? <WatchLists /> : <Login setUser={setUser} />} />
-                                <Route path="/analytics" element={user ? <Analytics /> : <Login setUser={setUser} />} />
-                                <Route path="/social" element={user ? <SocialFeed /> : <Login setUser={setUser} />} />
-                                <Route path="/virtual-trading" element={user ? <VirtualTrading /> : <Login setUser={setUser} />} />
-                                <Route path="/education" element={<Education />} />
-                                <Route path="/settings" element={user ? <SettingsComponent /> : <Login setUser={setUser} />} />
-                                <Route path="/" element={<Dashboard socket={socket} />} />
-                            </Routes>
-                        </main>
-                    </div>
-                </div>
+                    {/* Protected routes with sidebar/header */}
+                    <Route path="/dashboard" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><Dashboard socket={socket} /></AppLayout>} />
+                    <Route path="/chat" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><ChatInterface /></AppLayout>} />
+                    <Route path="/profile" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <UserProfile user={user} /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/market-overview" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><MarketOverview socket={socket} /></AppLayout>} />
+                    <Route path="/news" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><NewsSection /></AppLayout>} />
+                    <Route path="/portfolio" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <Portfolio /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/alerts" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <Alerts /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/watchlists" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <WatchLists /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/analytics" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <Analytics /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/social" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <SocialFeed /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/virtual-trading" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <VirtualTrading /> : <Login setUser={setUser} />}</AppLayout>} />
+                    <Route path="/education" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}><Education /></AppLayout>} />
+                    <Route path="/settings" element={<AppLayout user={user} socket={socket} onLogout={handleLogout} notifications={notifications}>{user ? <SettingsComponent /> : <Login setUser={setUser} />}</AppLayout>} />
+                </Routes>
             </ErrorBoundary>
         </Router>
+    );
+};
+
+// AppLayout component to wrap routes with sidebar and header
+const AppLayout = ({ user, socket, onLogout, notifications, children }) => {
+    return (
+        <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    className: 'bg-gray-800 text-white',
+                    duration: 4000,
+                }}
+            />
+
+            <Sidebar user={user} />
+
+            <div className="flex flex-col flex-1 border-l border-gray-700">
+                <Header user={user} onLogout={onLogout} notifications={notifications} />
+
+                <main className="flex-1 overflow-auto bg-gray-900">
+                    {children}
+                </main>
+            </div>
+        </div>
     );
 };
 
