@@ -246,12 +246,6 @@ const Header = ({ user, onLogout, notifications }) => {
                 <h2 className="text-xl font-semibold text-white">{getCurrentPageName()}</h2>
 
                 <div className="flex items-center space-x-4">
-                    {/* Real-time market ticker */}
-                    <div className="hidden lg:flex items-center space-x-4 text-sm">
-                        <div className="text-green-400">SPY: $456.78 ↑</div>
-                        <div className="text-red-400">QQQ: $389.45 ↓</div>
-                    </div>
-
                     {/* Notifications */}
                     {user && (
                         <div className="relative" ref={notificationRef}>

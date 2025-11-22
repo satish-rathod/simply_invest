@@ -74,14 +74,22 @@ export const createPortfolio = async (req, res) => {
 // Add stock to portfolio
 export const addStock = async (req, res) => {
   try {
-    const { symbol, quantity, price, type = 'PERSONAL' } = req.body;
+    const { symbol, quantity: rawQuantity, price: rawPrice, type = 'PERSONAL' } = req.body;
 
-    if (!symbol || !quantity) {
+    if (!symbol || !rawQuantity) {
       return res.status(400).json({ message: 'Symbol and quantity are required' });
     }
 
-    if (type === 'PERSONAL' && !price) {
-      return res.status(400).json({ message: 'Price is required for personal portfolio' });
+    // Convert to numbers and validate
+    const quantity = Number(rawQuantity);
+    const price = rawPrice ? Number(rawPrice) : null;
+
+    if (isNaN(quantity) || quantity <= 0) {
+      return res.status(400).json({ message: 'Quantity must be a positive number' });
+    }
+
+    if (type === 'PERSONAL' && (!price || isNaN(price) || price <= 0)) {
+      return res.status(400).json({ message: 'Valid price is required for personal portfolio' });
     }
 
     // Validate symbol against market data
@@ -169,14 +177,22 @@ export const addStock = async (req, res) => {
 // Remove stock from portfolio
 export const removeStock = async (req, res) => {
   try {
-    const { symbol, quantity, price, type = 'PERSONAL' } = req.body;
+    const { symbol, quantity: rawQuantity, price: rawPrice, type = 'PERSONAL' } = req.body;
 
-    if (!symbol || !quantity) {
+    if (!symbol || !rawQuantity) {
       return res.status(400).json({ message: 'Symbol and quantity are required' });
     }
 
-    if (type === 'PERSONAL' && !price) {
-      return res.status(400).json({ message: 'Price is required for personal portfolio' });
+    // Convert to numbers and validate
+    const quantity = Number(rawQuantity);
+    const price = rawPrice ? Number(rawPrice) : null;
+
+    if (isNaN(quantity) || quantity <= 0) {
+      return res.status(400).json({ message: 'Quantity must be a positive number' });
+    }
+
+    if (type === 'PERSONAL' && (!price || isNaN(price) || price <= 0)) {
+      return res.status(400).json({ message: 'Valid price is required for personal portfolio' });
     }
 
     const user = await User.findById(req.user.id);

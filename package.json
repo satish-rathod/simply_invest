@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/satish-rathod/simply-invest#readme",
   "devDependencies": {
+    "axios": "^1.13.2",
     "concurrently": "^8.2.2"
   }
 }

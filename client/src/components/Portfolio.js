@@ -85,7 +85,13 @@ const Portfolio = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5001/api/portfolio/add-stock', stockForm, {
+      // Convert to numbers to prevent string concatenation bug
+      const payload = {
+        symbol: stockForm.symbol,
+        quantity: Number(stockForm.quantity),
+        price: Number(stockForm.price)
+      };
+      await axios.post('http://localhost:5001/api/portfolio/add-stock', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -144,8 +150,9 @@ const Portfolio = () => {
   const handleRemoveStock = async (symbol, quantity, price) => {
     try {
       const token = localStorage.getItem('token');
+      // Ensure numbers are sent to prevent issues
       await axios.post('http://localhost:5001/api/portfolio/remove-stock',
-        { symbol, quantity, price },
+        { symbol, quantity: Number(quantity), price: Number(price) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -473,31 +480,21 @@ const Portfolio = () => {
               <div className="bg-gray-700 rounded-lg p-4">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Available Balance:</span>
-                    <span className="text-white font-semibold">${virtualBalance?.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-gray-400">Total Cost:</span>
                     <span className="text-white font-semibold">
                       ${(parseFloat(stockForm.quantity || 0) * parseFloat(stockForm.price || 0)).toFixed(2)}
                     </span>
                   </div>
-                  {(parseFloat(stockForm.quantity || 0) * parseFloat(stockForm.price || 0)) > virtualBalance && (
-                    <div className="text-red-400 text-xs mt-2">
-                      Insufficient funds
-                    </div>
-                  )}
+                  <p className="text-gray-400 text-xs mt-2">
+                    Personal portfolio tracks your real-world holdings
+                  </p>
                 </div>
               </div>
 
               <div className="flex space-x-4">
                 <button
                   type="submit"
-                  disabled={(parseFloat(stockForm.quantity || 0) * parseFloat(stockForm.price || 0)) > virtualBalance}
-                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${(parseFloat(stockForm.quantity || 0) * parseFloat(stockForm.price || 0)) > virtualBalance
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
                 >
                   Add Stock
                 </button>

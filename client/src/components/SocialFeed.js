@@ -151,16 +151,22 @@ const SocialFeed = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Social Trading</h1>
-          <p className="text-gray-400">Connect with fellow investors and share insights</p>
+          <h1 className="text-3xl font-bold">
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Social Trading
+            </span>
+          </h1>
+          <p className="text-gray-300 mt-1">Connect with fellow investors and share insights</p>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setShowCreatePost(true)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-blue-500/50 transition-all font-semibold"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           <span>Create Post</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Tab Navigation */}
@@ -211,10 +217,10 @@ const SocialFeed = () => {
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800 rounded-lg p-6"
+              className="bg-gray-800 border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-all"
             >
               <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white font-medium">
                     {post.author.name.charAt(0).toUpperCase()}
                   </span>
@@ -305,10 +311,10 @@ const SocialFeed = () => {
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800 rounded-lg p-6 border-l-4 border-yellow-400"
+              className="bg-gray-800 border border-gray-700 rounded-xl p-6 border-l-4 border-l-yellow-400 hover:border-gray-600 transition-all"
             >
               <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
@@ -349,8 +355,12 @@ const SocialFeed = () => {
       )}
 
       {activeTab === 'leaderboard' && (
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Top Performers</h2>
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+          <h2 className="text-2xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+              Top Performers
+            </span>
+          </h2>
           <div className="space-y-4">
             {leaderboard.map((entry, index) => (
               <div key={entry.id} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-colors">
@@ -377,13 +387,18 @@ const SocialFeed = () => {
 
       {/* Create Post Modal */}
       {showCreatePost && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowCreatePost(false)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-800 rounded-lg p-6 w-full max-w-md"
+            className="glassmorphic rounded-xl p-8 w-full max-w-md border border-gray-700 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl font-bold text-white mb-4">Create Post</h3>
+            <h3 className="text-2xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Create Post
+              </span>
+            </h3>
 
             <form onSubmit={handleCreatePost} className="space-y-4">
               <div>
@@ -430,19 +445,23 @@ const SocialFeed = () => {
               </div>
 
               <div className="flex space-x-4">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 px-4 rounded-lg transition-all font-semibold shadow-lg hover:shadow-blue-500/50"
                 >
                   Post
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => setShowCreatePost(false)}
-                  className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg transition-all font-semibold"
                 >
                   Cancel
-                </button>
+                </motion.button>
               </div>
             </form>
           </motion.div>

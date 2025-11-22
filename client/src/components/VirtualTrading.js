@@ -114,8 +114,10 @@ const VirtualTrading = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
+            // Convert quantity to number to prevent string concatenation bug
             await axios.post('http://localhost:5001/api/portfolio/add-stock', {
-                ...stockForm,
+                symbol: stockForm.symbol,
+                quantity: Number(stockForm.quantity),
                 type: 'VIRTUAL'
             }, {
                 headers: { Authorization: `Bearer ${token}` }
