@@ -1,61 +1,73 @@
-# Simply Invest - Multi-Tenant Financial Investment Platform
+# Simply Invest - AI-Powered Investment Platform
 
 ## 🚀 Project Overview
 
-Simply Invest is a comprehensive, multi-tenant financial investment platform built with the MERN stack (MongoDB, Express.js, React, Node.js). The platform provides users with real-time stock market data, AI-powered financial advice, portfolio management, social trading features, and educational resources. With its advanced white-label solution and multi-tenant architecture, the platform can be deployed for multiple organizations with customizable branding and features.
+**Simply Invest** is a completely free analytical platform designed for smart investors who want to make informed decisions with AI-powered insights. Built with the MERN stack (MongoDB, Express.js, React, Node.js), Simply Invest combines portfolio management, real-time market analysis, social trading, and educational resources into one comprehensive platform.
+
+### What Makes Simply Invest Special?
+
+- **100% Free**: No subscriptions, no hidden fees - all features are completely free
+- **AI-Powered Insights**: Get personalized investment advice powered by advanced AI and machine learning
+- **Real-Time Data**: Access live stock prices, market updates, and comprehensive financial data
+- **Social Trading**: Follow top traders, share insights, and learn from the investment community
+- **Virtual Trading**: Practice trading strategies risk-free before investing real money
+- **Educational Resources**: Learn investing fundamentals with structured courses and market insights
 
 ## ✨ Key Features
 
-### 🏢 Multi-Tenant Architecture
-- **Tenant Isolation**: Complete data separation between tenants
-- **Subscription Management**: Flexible plans (Starter, Professional, Enterprise)
-- **User Management**: Role-based access control with permissions
-- **Resource Limits**: Configurable user and storage limits per tenant
-- **Maintenance Mode**: Tenant-specific maintenance capabilities
+### 📊 Portfolio Management
+- **Real-Time Tracking**: Monitor your personal and virtual portfolios with live P&L analysis
+- **Performance Metrics**: Comprehensive portfolio performance tracking and analytics
+- **Holdings Overview**: Detailed view of all your investments and their performance
+- **Transaction History**: Complete record of all your trades and activities
+- **Multi-Portfolio Support**: Manage both real and virtual portfolios simultaneously
 
-### 🎨 White-Label Solution
-- **Custom Branding**: Logo, colors, typography, and company information
-- **Theme Customization**: Complete UI theming with color schemes
-- **Module Configuration**: Enable/disable features per tenant
-- **SEO Optimization**: Custom meta tags, descriptions, and keywords
-- **Custom CSS/JS**: Advanced customization options
+### 🤖 AI Financial Advisor
+- **Personalized Advice**: Get AI-powered investment recommendations tailored to your goals
+- **Market Analysis**: AI-driven market insights and trend predictions
+- **Stock Research**: Ask questions about any stock and get detailed AI analysis
+- **Investment Strategies**: Learn and implement proven investment strategies
+- **Risk Assessment**: AI-powered risk evaluation for your portfolio
 
-### 💼 Financial Features
-- **Portfolio Management**: Personal investment tracking with P&L analysis
-- **Real-time Market Data**: Live stock prices and market updates
-- **AI Financial Advisor**: OpenAI-powered investment guidance
-- **Stock Recommendations**: Daily curated investment suggestions
-- **Watchlists**: Monitor favorite stocks and assets
-- **Price Alerts**: Custom notifications for price movements
+### 📈 Real-Time Market Data
+- **Live Stock Prices**: Access real-time stock prices and market updates
+- **Market Overview**: Comprehensive view of market indices and trends
+- **Daily Market Pulse**: AI-generated summaries of market movements
+- **Stock Details**: In-depth information about any stock including financials and news
+- **Interactive Charts**: Advanced charting with technical indicators
+
+### 🎯 Virtual Trading Platform
+- **Risk-Free Practice**: Test trading strategies without risking real money
+- **Realistic Simulation**: Trade with virtual cash using real market data
+- **Performance Tracking**: Monitor your virtual portfolio performance
+- **Learn by Doing**: Practice before investing real capital
+
+### 👥 Social Trading & Community
+- **Follow Top Traders**: Learn from successful investors in the community
+- **Social Feed**: Share insights, strategies, and market views
+- **Leaderboards**: Track top performers and trending investors
+- **Engagement**: Upvote, comment, and interact with community posts
+- **User Profiles**: Build your investor profile and following
+
+### 📚 Educational Resources
+- **Structured Courses**: Learn investing fundamentals step-by-step
+- **Market Insights**: Daily market analysis and educational content
+- **Progress Tracking**: Track your learning journey and achievements
+- **Investment Guides**: Comprehensive guides on various investment strategies
+- **Financial Literacy**: Build your knowledge from beginner to advanced
+
+### 🔔 Price Alerts & Notifications
+- **Custom Alerts**: Set price alerts for any stock
+- **Real-Time Notifications**: Get instant alerts when price targets are hit
+- **Watchlist Monitoring**: Track your favorite stocks automatically
+- **Market Updates**: Stay informed about important market movements
 
 ### 📊 Advanced Analytics
-- **Performance Metrics**: Portfolio performance tracking
-- **Technical Analysis**: Charts and indicators
-- **Risk Assessment**: Investment risk evaluation
-- **Market Insights**: AI-powered market analysis
-- **Trading History**: Complete transaction tracking
-
-### 🌐 Social & Community
-- **Social Trading**: Follow and copy successful traders
-- **Investment Communities**: Join topic-specific groups
-- **Leaderboards**: Track top performers
-- **Discussion Forums**: Share insights and strategies
-- **User Profiles**: Professional investor profiles
-
-### 🎓 Educational Resources
-- **Learning Modules**: Structured investment courses
-- **Market Insights**: Daily market analysis and news
-- **Strategy Guides**: Investment strategy documentation
-- **Glossary**: Financial terms and definitions
-- **Video Tutorials**: Step-by-step learning content
-
-### 🔧 Technical Features
-- **PWA Support**: Progressive Web App capabilities
-- **Real-time Updates**: WebSocket-based live data
-- **Multi-language Support**: Internationalization (i18n)
-- **Automated Trading**: Integration with trading APIs
-- **Backtesting**: Strategy testing with historical data
-- **Push Notifications**: Real-time alerts and updates
+- **Technical Analysis**: Advanced charts with multiple indicators
+- **Performance Reports**: Detailed analytics on your portfolio performance
+- **Market Trends**: Identify and analyze market trends
+- **AI Predictions**: Machine learning-powered price predictions
+- **Risk Metrics**: Comprehensive risk assessment tools
 
 ## 🏗️ Technology Stack
 
@@ -77,66 +89,63 @@ Simply Invest is a comprehensive, multi-tenant financial investment platform bui
 - **PWA** capabilities with service workers
 
 ### Database Models
-- **Multi-tenant Models**: Tenant, WhiteLabelConfig, TenantUser
 - **User Management**: User, UserActivity, UserProgress
-- **Financial Data**: Portfolio, Trade, Alert, WatchList, MarketData
-- **Social Features**: Post, Comment, Following, Community
+- **Portfolio Data**: Portfolio, Trade, Alert, WatchList
+- **Market Data**: MarketData, StockInfo, PriceHistory
+- **Social Features**: Post, Comment, Following, Leaderboard
 - **Educational**: Course, Module, MarketInsight
+- **AI Chat**: ChatSession, ChatMessage
 
 ## 📁 Project Structure
 
 ```
-/app/
+simply-invest/
 ├── server/                     # Backend (Node.js/Express)
 │   ├── controllers/           # API controllers
-│   │   ├── tenantController.js
-│   │   ├── whiteLabelController.js
-│   │   ├── tenantUserController.js
 │   │   ├── authController.js
 │   │   ├── portfolioController.js
 │   │   ├── chatController.js
-│   │   └── ...
+│   │   ├── socialController.js
+│   │   ├── financeController.js
+│   │   └── educationController.js
 │   ├── models/               # Database models
-│   │   ├── Tenant.js
-│   │   ├── WhiteLabelConfig.js
-│   │   ├── TenantUser.js
 │   │   ├── User.js
 │   │   ├── Portfolio.js
-│   │   └── ...
+│   │   ├── Trade.js
+│   │   ├── Post.js
+│   │   ├── ChatSession.js
+│   │   └── Course.js
 │   ├── routes/               # API routes
-│   │   ├── tenantRoutes.js
-│   │   ├── whiteLabelRoutes.js
-│   │   ├── tenantUserRoutes.js
-│   │   └── ...
+│   │   ├── authRoutes.js
+│   │   ├── portfolioRoutes.js
+│   │   ├── socialRoutes.js
+│   │   └── financeRoutes.js
 │   ├── middleware/           # Custom middleware
-│   │   ├── tenantMiddleware.js
 │   │   ├── authMiddleware.js
-│   │   └── ...
+│   │   └── errorHandler.js
 │   ├── utils/                # Utility functions
-│   │   ├── scraper.js
 │   │   ├── aiService.js
 │   │   ├── marketData.js
-│   │   └── ...
+│   │   └── scraper.js
 │   ├── scripts/              # Utility scripts
-│   │   └── seedTenants.js
+│   │   └── seedData.js
 │   └── server.js            # Main server file
 ├── client/                   # Frontend (React)
 │   ├── src/
 │   │   ├── components/      # React components
-│   │   │   ├── AdminPanel.js
-│   │   │   ├── WhiteLabelConfig.js
+│   │   │   ├── LandingPage.js
+│   │   │   ├── Dashboard.js
 │   │   │   ├── Portfolio.js
 │   │   │   ├── Analytics.js
-│   │   │   └── ...
-│   │   ├── i18n/           # Internationalization
+│   │   │   ├── SocialFeed.js
+│   │   │   ├── ChatInterface.js
+│   │   │   └── Education.js
 │   │   ├── utils/          # Utility functions
 │   │   ├── App.js          # Main app component
 │   │   └── index.js        # Entry point
 │   ├── public/
-│   │   ├── manifest.json   # PWA manifest
-│   │   └── sw.js          # Service worker
+│   │   └── manifest.json   # PWA manifest
 │   └── package.json
-├── supervisord.conf         # Process management
 └── README.md
 ```
 
@@ -163,7 +172,7 @@ Simply Invest is a comprehensive, multi-tenant financial investment platform bui
    
    # Install client dependencies
    cd ../client
-   yarn install
+   npm install
    ```
 
 3. **Environment Setup**
@@ -176,19 +185,19 @@ Simply Invest is a comprehensive, multi-tenant financial investment platform bui
    # Authentication
    JWT_SECRET=your_jwt_secret_here
    
-   # External APIs (Optional)
-   OPENAI_API_KEY=your_openai_key_here
-   ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key_here
-   NEWS_API_KEY=your_news_api_key_here
+   # External APIs
+   OPENAI_API_KEY=your_openai_key_here          # Required for AI features
+   ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key # Optional - for market data
+   NEWS_API_KEY=your_news_api_key               # Optional - for news feeds
    
    # Server Configuration
-   PORT=5000
+   PORT=5001
    NODE_ENV=development
    ```
    
    Create `.env` file in the client directory:
    ```env
-   REACT_APP_BACKEND_URL=http://localhost:5000
+   REACT_APP_BACKEND_URL=http://localhost:5001
    ```
 
 4. **Database Setup**
@@ -196,173 +205,153 @@ Simply Invest is a comprehensive, multi-tenant financial investment platform bui
    # Start MongoDB service
    mongod
    
-   # Run the seed script to create default tenant and admin user
+   # (Optional) Run the seed script to populate sample data
    cd server
-   node scripts/seedTenants.js
+   node scripts/seedData.js
    ```
 
 5. **Start the application**
    ```bash
    # Start backend server (from server directory)
    npm start
+   # Server will run on http://localhost:5001
    
-   # Start frontend client (from client directory)
-   yarn start
+   # In a new terminal, start frontend (from client directory)
+   cd client
+   npm start
+   # Frontend will run on http://localhost:3000
    ```
 
 6. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - Admin Panel: Use credentials from seed script
+   - Open your browser and navigate to http://localhost:3000
+   - You'll see the landing page - click "Register" to create an account
+   - Start exploring the platform!
 
-### Default Admin Credentials
-After running the seed script, you can login with:
-- **Email**: admin@simplyinvest.com
-- **Password**: admin123
+## 🎯 Getting Started
 
-## 🏢 Multi-Tenant Setup
+After installation:
+1. **Create an account**: Click "Register" on the landing page
+2. **Explore the dashboard**: View your portfolio, market data, and AI insights
+3. **Try virtual trading**: Practice with virtual cash before investing real money
+4. **Join the community**: Follow other traders and share your insights
+5. **Learn**: Access educational courses and market insights
 
-### Creating a New Tenant
-
-1. **Login as Admin**
-   - Access the admin panel at `/admin`
-   - Use the default admin credentials
-
-2. **Create Tenant**
-   - Click "Create Tenant" in the admin panel
-   - Fill in tenant details:
-     - Name, domain, subdomain
-     - Contact information
-     - Subscription plan
-     - Enabled features
-
-3. **Configure White-Label**
-   - Access white-label configuration
-   - Customize theme colors
-   - Upload logos and branding assets
-   - Configure SEO settings
-   - Enable/disable modules
-
-### Tenant Access Methods
-
-Users can access tenant-specific instances through:
-
-1. **Subdomain**: `https://tenant.yourdomain.com`
-2. **Custom Domain**: `https://tenant-custom-domain.com`
-3. **Header-based**: Include `X-Tenant-ID` header in API requests
-4. **Query Parameter**: `?tenant=tenant-id`
-
-## 🔧 API Documentation
+## 📡 API Documentation
 
 ### Authentication Endpoints
 ```
 POST /api/auth/register     # User registration
 POST /api/auth/login        # User login
-GET  /api/auth/me          # Get current user
+GET  /api/auth/me          # Get current user profile
+PUT  /api/auth/profile     # Update user profile
 ```
 
-### Tenant Management
+### Portfolio Management
 ```
-GET    /api/tenants                    # List all tenants
-POST   /api/tenants                    # Create new tenant
-GET    /api/tenants/:id                # Get tenant by ID
-PUT    /api/tenants/:id                # Update tenant
-DELETE /api/tenants/:id                # Delete tenant
-PUT    /api/tenants/:id/features       # Update tenant features
-PUT    /api/tenants/:id/maintenance    # Toggle maintenance mode
-GET    /api/tenants/:id/analytics      # Get tenant analytics
+GET  /api/portfolio              # Get user's portfolio
+POST /api/portfolio/buy          # Buy stock (real or virtual)
+POST /api/portfolio/sell         # Sell stock holdings
+GET  /api/portfolio/performance  # Get portfolio performance metrics
+GET  /api/portfolio/history      # Get transaction history
 ```
 
-### White-Label Configuration
+### Market Data
 ```
-GET  /api/white-label/:tenantId           # Get configuration
-PUT  /api/white-label/:tenantId           # Update configuration
-PUT  /api/white-label/:tenantId/theme     # Update theme
-PUT  /api/white-label/:tenantId/branding  # Update branding
-PUT  /api/white-label/:tenantId/modules   # Update modules
-GET  /api/white-label/public/:domain      # Get public config
-```
-
-### Financial Data
-```
-GET  /api/portfolio           # Get user portfolio
-POST /api/portfolio/add       # Add investment
-GET  /api/stocks/:symbol      # Get stock data
-GET  /api/watchlists         # Get watchlists
-POST /api/alerts             # Create price alert
+GET  /api/finance/stock/:symbol        # Get stock details
+GET  /api/finance/search/:query        # Search for stocks
+GET  /api/finance/market-overview      # Get market overview
+GET  /api/finance/trending             # Get trending stocks
+GET  /api/public/stats                 # Get platform statistics
 ```
 
-## 🎨 Customization Guide
+### AI Chat & Analysis
+```
+POST /api/chat/message          # Send message to AI advisor
+GET  /api/chat/sessions         # Get user's chat sessions
+POST /api/chat/sessions         # Create new chat session
+DELETE /api/chat/sessions/:id   # Delete chat session
+```
 
-### Theme Customization
-Access the white-label configuration panel to customize:
-- **Primary Colors**: Main brand colors
-- **Typography**: Font families and sizes
-- **Layout**: Spacing and component styling
-- **Components**: Individual component theming
+### Social Trading
+```
+GET  /api/social/feed           # Get social feed posts
+POST /api/social/posts          # Create new post
+POST /api/social/posts/:id/upvote    # Upvote a post
+POST /api/social/posts/:id/downvote  # Downvote a post
+POST /api/social/posts/:id/comment   # Comment on a post
+GET  /api/social/leaderboard    # Get leaderboard
+GET  /api/social/trending       # Get trending posts
+```
 
-### Feature Configuration
-Enable/disable features per tenant:
-- Portfolio Management
-- Social Trading
-- Educational Content
-- AI Financial Advisor
-- Advanced Analytics
-- Trading Integration
+### Alerts & Watchlists
+```
+GET  /api/alerts                # Get user's price alerts
+POST /api/alerts                # Create price alert
+DELETE /api/alerts/:id          # Delete price alert
+GET  /api/watchlists            # Get user's watchlists
+POST /api/watchlists            # Add stock to watchlist
+```
 
-### Branding Elements
-- Company logo and favicon
-- App name and tagline
-- Meta tags and SEO
-- Custom CSS/JavaScript
-- Email templates
+### Education
+```
+GET  /api/education/courses     # Get available courses
+GET  /api/education/insights    # Get market insights
+POST /api/education/progress    # Update course progress
+```
 
-## 🔒 Security Features
 
+
+## 📊 Platform Features
+
+### Security
 - **JWT Authentication**: Secure token-based authentication
-- **Tenant Isolation**: Complete data separation
-- **Rate Limiting**: API request throttling
+- **Password Encryption**: Bcrypt password hashing
+- **Rate Limiting**: API request throttling to prevent abuse
 - **Input Validation**: Comprehensive data validation
 - **CORS Protection**: Cross-origin request security
-- **Helmet Security**: HTTP headers protection
+- **Environment Variables**: Secure configuration management
 
-## 📊 Monitoring & Analytics
+### Performance
+- **API Caching**: Hourly caching for external API calls (Alpha Vantage, News API)
+- **Database Indexing**: Optimized MongoDB queries
+- **Real-time Updates**: Efficient WebSocket connections
+- **Lazy Loading**: Optimized frontend performance
 
-### Tenant Analytics
-- Monthly active users
-- Total page views
-- Session duration
-- Conversion rates
-- Revenue tracking
+## 🚀 Deployment
 
-### System Metrics
-- Server performance
-- Database optimization
-- API response times
-- Error tracking
-- User behavior analysis
+### Production Deployment Steps
 
-## 🌐 Deployment
+1. **Set up production MongoDB**
+   - Use MongoDB Atlas or your own MongoDB cluster
+   - Update `MONGO_URI` in production environment
 
-### Production Deployment
-1. Set up production MongoDB cluster
-2. Configure environment variables
-3. Build frontend for production
-4. Deploy using PM2 or Docker
-5. Set up reverse proxy (Nginx)
-6. Configure SSL certificates
+2. **Configure environment variables**
+   - Set all required environment variables on your hosting platform
+   - Ensure `NODE_ENV=production`
+   - Add production API keys
 
-### Docker Deployment
-```dockerfile
-# Example Dockerfile structure
-FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 5000
-CMD ["npm", "start"]
-```
+3. **Build frontend for production**
+   ```bash
+   cd client
+   npm run build
+   ```
+
+4. **Deploy backend**
+   - Deploy to platforms like Heroku, DigitalOcean, AWS, or Railway
+   - Ensure Node.js v16+ is available
+   - Start server with `npm start`
+
+5. **Deploy frontend**
+   - Deploy the `client/build` folder to Netlify, Vercel, or similar
+   - Configure environment variables for production API URL
+
+6. **Optional: Use PM2 for process management**
+   ```bash
+   npm install -g pm2
+   pm2 start server.js --name simply-invest
+   pm2 save
+   pm2 startup
+   ```
 
 ## 🤝 Contributing
 
@@ -383,13 +372,32 @@ For support and questions:
 - Contact the development team
 - Check the documentation wiki
 
+## � Screenshots
+
+### Landing Page
+The landing page showcases all platform features with a modern, gradient-rich design that immediately communicates the value proposition: a completely free AI-powered investment platform.
+
+### Dashboard
+Comprehensive dashboard showing portfolio performance, market overview, AI insights, and quick access to all platform features.
+
+### Portfolio Management
+Track both real and virtual portfolios with detailed P&L analysis, transaction history, and performance metrics.
+
+### AI Financial Advisor
+Chat interface powered by OpenAI providing personalized investment advice, stock analysis, and market insights.
+
+### Social Trading
+Engage with the investment community through posts, comments, leaderboards, and following top traders.
+
 ## 🚀 Future Roadmap
 
-- [ ] Mobile app development
-- [ ] Advanced backtesting engine
-- [ ] Cryptocurrency support
-- [ ] Options trading features
-- [ ] Advanced technical indicators
-- [ ] Machine learning predictions
-- [ ] API marketplace integration
-- [ ] Advanced reporting dashboard
+- [ ] **Mobile App**: Native iOS and Android applications
+- [ ] **Advanced Charting**: More technical indicators and drawing tools
+- [ ] **Cryptocurrency Support**: Track and trade crypto assets
+- [ ] **Options Trading**: Options analysis and virtual options trading
+- [ ] **Portfolio Optimization**: AI-powered portfolio rebalancing suggestions
+- [ ] **Tax Reporting**: Generate tax reports for realized gains/losses
+- [ ] **News Aggregation**: Personalized news feed based on portfolio
+- [ ] **Dividend Tracking**: Track dividend income and reinvestment
+- [ ] **Multi-language Support**: Internationalization for global users
+- [ ] **Dark/Light Themes**: User-selectable theme preferences
