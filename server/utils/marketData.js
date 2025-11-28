@@ -3,8 +3,8 @@ import axios from 'axios';
 import MarketData from '../models/MarketData.js';
 import NodeCache from 'node-cache';
 
-// Cache for 1 minute to avoid too many API calls
-const cache = new NodeCache({ stdTTL: 60 });
+// Cache for 2 minutes to avoid too many API calls
+const cache = new NodeCache({ stdTTL: 120 });
 
 // Get stock price with fallback options
 export const getStockPrice = async (symbol) => {

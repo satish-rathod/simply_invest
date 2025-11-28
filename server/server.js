@@ -210,6 +210,9 @@ const broadcastStockUpdates = async () => {
 
     for (const symbol of popularStocks) {
       try {
+        // Add a small delay to avoid rate limiting (stagger requests)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         const price = await getStockPrice(symbol);
         io.to(`stock-${symbol}`).emit('price-update', {
           symbol,
@@ -259,8 +262,8 @@ cron.schedule('*/5 * * * *', async () => {
   }
 });
 
-// Broadcast stock price updates every 30 seconds (only if clients are connected)
-cron.schedule('*/30 * * * * *', async () => {
+// Broadcast stock price updates every 60 seconds (only if clients are connected)
+cron.schedule('*/60 * * * * *', async () => {
   if (io.engine.clientsCount > 0) {
     await broadcastStockUpdates();
   }
