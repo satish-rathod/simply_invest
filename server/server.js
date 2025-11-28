@@ -129,6 +129,15 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Simply Invest API is running',
+    status: 'OK',
+    documentation: '/api-docs' // Assuming there might be docs, or just a placeholder
+  });
+});
+
 // MongoDB Connection with connection pool configuration
 mongoose.connect(process.env.MONGO_URI, {
   maxPoolSize: 10, // Limit maximum concurrent connections
