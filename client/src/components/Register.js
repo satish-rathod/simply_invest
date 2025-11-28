@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import logoImage from '../logo.png';
+import config from '../config';
 
 const Register = ({ setUser }) => {
     const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const Register = ({ setUser }) => {
         setError('');
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5001/api/auth/register', formData);
+            const response = await axios.post(`${config.API_URL}/api/auth/register`, formData);
             const userData = response.data;
             localStorage.setItem('token', userData.token);
             localStorage.setItem('user', JSON.stringify({

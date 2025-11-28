@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { User, Mail, Calendar, Activity, Star, Settings, Edit } from 'lucide-react';
+import ProfileSkeleton from './ProfileSkeleton';
+import config from '../config';
 
 const UserProfile = () => {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    // const [isEditing, setIsEditing] = useState(false);
+    // const [editForm, setEditForm] = useState({
+    //     username: '',
+    //     email: '',
+    //     bio: ''
+    // });
 
     useEffect(() => {
-        fetchProfileData();
+        fetchProfile();
     }, []);
 
-    const fetchProfileData = async () => {
+    const fetchProfile = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5001/api/auth/profile', {
+            const response = await axios.get(`${config.API_URL}/api/auth/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProfileData(response.data);
@@ -28,11 +37,7 @@ const UserProfile = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        return <ProfileSkeleton />;
     }
 
     if (error) {
@@ -55,7 +60,7 @@ const UserProfile = () => {
             <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
                 <div className="flex items-center mb-6">
                     <img
-                        src={profileData.avatar || 'https://via.placeholder.com/150'}
+                        src={'https://via.placeholder.com/150'}
                         alt="Profile"
                         className="w-24 h-24 rounded-full mr-6"
                     />
@@ -66,10 +71,16 @@ const UserProfile = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InfoItem icon={<User />} label="Username" value={profileData.username} />
+                    <InfoItem icon={<User />} label="Username" value={profileData.username || 'Not set'} />
                     <InfoItem icon={<Mail />} label="Email" value={profileData.email} />
                     <InfoItem icon={<Calendar />} label="Joined" value={new Date(profileData.createdAt).toLocaleDateString()} />
-                    <InfoItem icon={<Activity />} label="Last Active" value={profileData.lastActive || 'Invalid Date'} />
+                    <InfoItem icon={<Activity />} label="Last Active" value={profileData.lastActive ? new Date(profileData.lastActive).toLocaleDateString() : 'Recently'} />
+                    {profileData.bio && (
+                        <div className="col-span-1 md:col-span-2 mt-4">
+                            <h3 className="text-sm text-gray-500 mb-1">Bio</h3>
+                            <p className="text-gray-300">{profileData.bio}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -79,10 +90,10 @@ const UserProfile = () => {
             </div>
 
             <div className="mt-6 flex justify-end">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 flex items-center">
+                <Link to="/settings" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 flex items-center">
                     <Edit size={16} className="mr-2" />
                     Edit Profile
-                </button>
+                </Link>
             </div>
         </motion.div>
     );

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { TrendingUp, DollarSign, Activity, BarChart2 } from 'lucide-react';
 import ModernChart from './ModernChart';
 import StackedRecommendationCards from './StackedRecommendationCards';
+import DashboardSkeleton from './DashboardSkeleton';
+import config from '../config';
 
 const Dashboard = () => {
   const [marketData, setMarketData] = useState([]);
@@ -15,16 +17,16 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const config = {
+        const authConfig = {
           headers: {
             Authorization: `Bearer ${token}`
           }
         };
 
         const [marketResponse, recommendationsResponse, summaryResponse] = await Promise.all([
-          axios.get('http://localhost:5001/api/stocks/market-details'),
-          axios.get('http://localhost:5001/api/stocks/recommendations'),
-          axios.get('http://localhost:5001/api/dashboard/summary', config)
+          axios.get(`${config.API_URL}/api/stocks/market-details`),
+          axios.get(`${config.API_URL}/api/stocks/recommendations`),
+          axios.get(`${config.API_URL}/api/dashboard/summary`, authConfig)
         ]);
 
         const transformedMarketData = marketResponse.data.map(item => ({
@@ -46,11 +48,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

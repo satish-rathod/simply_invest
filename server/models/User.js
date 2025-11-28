@@ -11,6 +11,9 @@ const userSchema = new mongoose.Schema({
     },
     password: { type: String, required: true },
     virtualBalance: { type: Number, default: 50000 },
+    bio: { type: String, default: '' },
+    lastActive: { type: Date, default: Date.now },
+    username: { type: String, unique: true, sparse: true },
 }, { timestamps: true });
 
 // Remove the pre-save hook

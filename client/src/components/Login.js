@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import config from '../config';
 import logoImage from '../logo.png';
 
 const Login = ({ setUser }) => {
@@ -26,7 +27,7 @@ const Login = ({ setUser }) => {
         setError('');
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5001/api/auth/login', formData);
+            const response = await axios.post(`${config.API_URL}/api/auth/login`, formData);
             const { user, token } = response.data;
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));

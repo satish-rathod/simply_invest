@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Home, MessageSquare, TrendingUp, Newspaper, Briefcase, Bell, List, BarChart3, Settings, User, Users, BookOpen } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import io from 'socket.io-client';
+import config from './config';
 
 // Import components
 import Register from './components/Register';
@@ -42,7 +43,7 @@ const App = () => {
                 setUser(parsedUserData);
 
                 // Initialize socket connection
-                const newSocket = io('http://localhost:5001');
+                const newSocket = io(config.API_URL);
                 setSocket(newSocket);
 
                 // Join user room for real-time updates

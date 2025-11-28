@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, ThumbsUp, ThumbsDown, MessageCircle, Share2, TrendingUp, Users, Trophy, Filter } from 'lucide-react';
+import { Plus, ThumbsUp, ThumbsDown, MessageCircle, Share2, TrendingUp, Users, Trophy } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
+import SocialSkeleton from './SocialSkeleton';
+import config from '../config';
 
 const SocialFeed = () => {
   const [posts, setPosts] = useState([]);
@@ -27,13 +29,13 @@ const SocialFeed = () => {
     try {
       const token = localStorage.getItem('token');
       const [feedRes, trendingRes, leaderboardRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/social/feed', {
+        axios.get(`${config.API_URL}/api/social/feed`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5001/api/social/trending', {
+        axios.get(`${config.API_URL}/api/social/trending`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5001/api/social/leaderboard', {
+        axios.get(`${config.API_URL}/api/social/leaderboard`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -55,7 +57,7 @@ const SocialFeed = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5001/api/social/posts', newPost, {
+      const response = await axios.post(`${config.API_URL}/api/social/posts`, newPost, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -72,7 +74,7 @@ const SocialFeed = () => {
   const handleUpvote = async (postId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:5001/api/social/posts/${postId}/upvote`, {}, {
+      const response = await axios.post(`${config.API_URL}/api/social/posts/${postId}/upvote`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -97,7 +99,7 @@ const SocialFeed = () => {
   const handleDownvote = async (postId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:5001/api/social/posts/${postId}/downvote`, {}, {
+      const response = await axios.post(`${config.API_URL}/api/social/posts/${postId}/downvote`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -139,11 +141,7 @@ const SocialFeed = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <SocialSkeleton />;
   }
 
   return (

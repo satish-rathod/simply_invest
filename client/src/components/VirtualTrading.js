@@ -1,47 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, TrendingUp, TrendingDown, DollarSign, Target, Activity, ArrowDownCircle, Trash2 } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, DollarSign, Activity, ArrowDownCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import PortfolioSkeleton from './PortfolioSkeleton';
+import config from '../config';
 
 const VirtualTrading = () => {
     const [portfolio, setPortfolio] = useState(null);
     const [performance, setPerformance] = useState(null);
     const [transactions, setTransactions] = useState([]);
-    const [virtualBalance, setVirtualBalance] = useState(0);
     const [loading, setLoading] = useState(true);
     const [showBuyStock, setShowBuyStock] = useState(false);
     const [showSellStock, setShowSellStock] = useState(false);
+    const [virtualBalance, setVirtualBalance] = useState(0);
     const [selectedHolding, setSelectedHolding] = useState(null);
     const [stockForm, setStockForm] = useState({
         symbol: '',
-        quantity: ''
+        quantity: '',
+        price: ''
     });
     const [sellForm, setSellForm] = useState({
         quantity: ''
     });
-    const [marketPrice, setMarketPrice] = useState(null);
-    const [checkingPrice, setCheckingPrice] = useState(false);
 
-    useEffect(() => {
-        fetchPortfolioData();
-    }, []);
-
-    const fetchPortfolioData = async () => {
+    const fetchPortfolioData = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const [portfolioRes, performanceRes, transactionsRes, profileRes] = await Promise.all([
-                axios.get('http://localhost:5001/api/portfolio?type=VIRTUAL', {
+                axios.get(`${config.API_URL}/api/portfolio?type=VIRTUAL`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }),
-                axios.get('http://localhost:5001/api/portfolio/performance?type=VIRTUAL', {
+                axios.get(`${config.API_URL}/api/portfolio/performance?type=VIRTUAL`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }),
-                axios.get('http://localhost:5001/api/portfolio/transactions?type=VIRTUAL', {
+                axios.get(`${config.API_URL}/api/portfolio/transactions?type=VIRTUAL`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }),
-                axios.get('http://localhost:5001/api/auth/profile', {
+                axios.get(`${config.API_URL}/api/auth/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
             ]);
@@ -61,12 +58,16 @@ const VirtualTrading = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchPortfolioData();
+    }, [fetchPortfolioData]);
 
     const createPortfolio = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5001/api/portfolio', { type: 'VIRTUAL' }, {
+            const response = await axios.post(`${config.API_URL}/api/portfolio`, { type: 'VIRTUAL' }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPortfolio(response.data);
@@ -85,37 +86,12 @@ const VirtualTrading = () => {
         }
     };
 
-    const checkPrice = async (symbol) => {
-        if (!symbol) return;
-        setCheckingPrice(true);
-        try {
-            // We can use a simple endpoint or just rely on the add-stock validation, 
-            // but for UI feedback let's try to fetch a quote if we have an endpoint, 
-            // or just simulate it. Since we don't have a direct public quote endpoint 
-            // exposed easily without auth or specific structure, we'll rely on the 
-            // backend validation mainly, but here we can try to fetch market overview data 
-            // or just let the user submit.
-            // For better UX, let's assume the backend handles the price fetch on submit.
-            // However, to show "Estimated Cost", we need a price.
-            // Let's use the /api/market/quote endpoint if available, or just wait for submit.
-            // Based on previous file views, we don't have a direct quote endpoint for frontend 
-            // easily accessible. Let's implement a quick check or just show "Market Price" 
-            // and calculate on server.
-
-            // ACTUALLY, we should probably add a quote endpoint or use existing market data.
-            // For now, we will show "Market Price" and let the server handle it.
-            setMarketPrice(null);
-        } finally {
-            setCheckingPrice(false);
-        }
-    };
-
     const handleBuyStock = async (e) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
             // Convert quantity to number to prevent string concatenation bug
-            await axios.post('http://localhost:5001/api/portfolio/add-stock', {
+            await axios.post(`${config.API_URL}/api/portfolio/add-stock`, {
                 symbol: stockForm.symbol,
                 quantity: Number(stockForm.quantity),
                 type: 'VIRTUAL'
@@ -157,7 +133,7 @@ const VirtualTrading = () => {
             }
 
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5001/api/portfolio/remove-stock',
+            await axios.post(`${config.API_URL}/api/portfolio/remove-stock`,
                 {
                     symbol: selectedHolding.symbol,
                     quantity,
@@ -190,11 +166,7 @@ const VirtualTrading = () => {
     const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0'];
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        return <PortfolioSkeleton />;
     }
 
     return (
@@ -235,7 +207,7 @@ const VirtualTrading = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">Total Gain/Loss</p>
-                            <p className={`text-2xl font-bold ${performance?.totalGainLoss >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <p className={`text - 2xl font - bold ${performance?.totalGainLoss >= 0 ? 'text-green-400' : 'text-red-400'} `}>
                                 ${performance?.totalGainLoss?.toFixed(2) || '0.00'}
                             </p>
                         </div>
@@ -255,7 +227,7 @@ const VirtualTrading = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">Return %</p>
-                            <p className={`text-2xl font-bold ${performance?.totalGainLossPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <p className={`text - 2xl font - bold ${performance?.totalGainLossPercent >= 0 ? 'text-green-400' : 'text-red-400'} `}>
                                 {performance?.totalGainLossPercent?.toFixed(2) || '0.00'}%
                             </p>
                         </div>
@@ -305,7 +277,7 @@ const VirtualTrading = () => {
                                             <td className="py-3 text-right text-gray-300">{holding.quantity}</td>
                                             <td className="py-3 text-right text-gray-300">${holding.averagePrice.toFixed(2)}</td>
                                             <td className="py-3 text-right text-gray-300">${holding.currentPrice.toFixed(2)}</td>
-                                            <td className={`py-3 text-right ${gainLoss >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            <td className={`py - 3 text - right ${gainLoss >= 0 ? 'text-green-400' : 'text-red-400'} `}>
                                                 ${gainLoss.toFixed(2)} ({gainLossPercent.toFixed(2)}%)
                                             </td>
                                             <td className="py-3 text-right">
@@ -350,13 +322,13 @@ const VirtualTrading = () => {
                                         outerRadius={100}
                                         fill="#8884d8"
                                         dataKey="value"
-                                        label={({ name, percentage }) => `${name} ${percentage}%`}
+                                        label={({ name, percentage }) => `${name} ${percentage}% `}
                                     >
                                         {getPieChartData().map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            <Cell key={`cell - ${index} `} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                                    <Tooltip formatter={(value) => `$${value.toFixed(2)} `} />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
@@ -396,8 +368,8 @@ const VirtualTrading = () => {
                                     </td>
                                     <td className="py-3 text-white font-medium">{transaction.symbol}</td>
                                     <td className="py-3">
-                                        <span className={`px-2 py-1 rounded text-xs ${transaction.type === 'BUY' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-                                            }`}>
+                                        <span className={`px - 2 py - 1 rounded text - xs ${transaction.type === 'BUY' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                                            } `}>
                                             {transaction.type}
                                         </span>
                                     </td>
@@ -525,7 +497,7 @@ const VirtualTrading = () => {
                                     value={sellForm.quantity}
                                     onChange={(e) => setSellForm({ ...sellForm, quantity: e.target.value })}
                                     className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder={`Max: ${selectedHolding.quantity}`}
+                                    placeholder={`Max: ${selectedHolding.quantity} `}
                                     min="1"
                                     max={selectedHolding.quantity}
                                     step="1"

@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { BookOpen, Play, Award, Clock, Star, TrendingUp, Users, CheckCircle, Lock } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import EducationSkeleton from './EducationSkeleton';
+import config from '../config';
 
 const Education = () => {
   const [courses, setCourses] = useState([]);
@@ -19,9 +21,9 @@ const Education = () => {
   const fetchEducationData = async () => {
     try {
       const [coursesRes, insightsRes, progressRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/education/courses'),
-        axios.get('http://localhost:5001/api/education/insights'),
-        axios.get('http://localhost:5001/api/education/progress', {
+        axios.get(`${config.API_URL}/api/education/courses`),
+        axios.get(`${config.API_URL}/api/education/insights`),
+        axios.get(`${config.API_URL}/api/education/progress`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }).catch(() => ({ data: null }))
       ]);
@@ -45,7 +47,7 @@ const Education = () => {
         return;
       }
 
-      await axios.post(`http://localhost:5001/api/education/courses/${courseId}/enroll`, {}, {
+      await axios.post(`${config.API_URL}/api/education/courses/${courseId}/enroll`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -77,11 +79,7 @@ const Education = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <EducationSkeleton />;
   }
 
   return (
@@ -117,8 +115,8 @@ const Education = () => {
         <button
           onClick={() => setActiveTab('courses')}
           className={`pb-2 px-1 font-medium ${activeTab === 'courses'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
             }`}
         >
           <div className="flex items-center space-x-2">
@@ -129,8 +127,8 @@ const Education = () => {
         <button
           onClick={() => setActiveTab('insights')}
           className={`pb-2 px-1 font-medium ${activeTab === 'insights'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
             }`}
         >
           <div className="flex items-center space-x-2">
@@ -141,8 +139,8 @@ const Education = () => {
         <button
           onClick={() => setActiveTab('progress')}
           className={`pb-2 px-1 font-medium ${activeTab === 'progress'
-              ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-gray-400 hover:text-white'
+            ? 'text-blue-400 border-b-2 border-blue-400'
+            : 'text-gray-400 hover:text-white'
             }`}
         >
           <div className="flex items-center space-x-2">

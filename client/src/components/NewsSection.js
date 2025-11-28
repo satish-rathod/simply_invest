@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ExternalLink } from 'lucide-react';
+import NewsSkeleton from './NewsSkeleton';
+import config from '../config';
 
 const NewsSection = () => {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('ALL');
 
     useEffect(() => {
         fetchNews();
@@ -14,12 +17,12 @@ const NewsSection = () => {
 
     const fetchNews = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/news/financial');
+            const response = await axios.get(`${config.API_URL}/api/news/financial`);
             setNews(response.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching news:', error);
-            setError(`Failed to fetch news: ${error.message}`);
+            setError('Failed to load news. Please try again later.');
             setLoading(false);
         }
     };

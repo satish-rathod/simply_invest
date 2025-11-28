@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Bell, TrendingUp, TrendingDown, Volume2, Newspaper, Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import AlertsSkeleton from './AlertsSkeleton';
+import config from '../config';
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -21,7 +23,7 @@ const Alerts = () => {
   const fetchAlerts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5001/api/alerts', {
+      const response = await axios.get(`${config.API_URL}/api/alerts`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAlerts(response.data);
@@ -37,7 +39,7 @@ const Alerts = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5001/api/alerts', alertForm, {
+      await axios.post(`${config.API_URL}/api/alerts`, alertForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -54,7 +56,7 @@ const Alerts = () => {
   const handleToggleAlert = async (id, isActive) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5001/api/alerts/${id}`,
+      await axios.put(`${config.API_URL}/api/alerts/${id}`,
         { isActive: !isActive },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -72,7 +74,7 @@ const Alerts = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/api/alerts/${id}`, {
+      await axios.delete(`${config.API_URL}/api/alerts/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -229,10 +231,10 @@ const Alerts = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className={`p-4 rounded-lg border-l-4 ${alert.isTriggered
-                    ? 'bg-yellow-900 border-yellow-400'
-                    : alert.isActive
-                      ? 'bg-gray-700 border-green-400'
-                      : 'bg-gray-700 border-gray-500'
+                  ? 'bg-yellow-900 border-yellow-400'
+                  : alert.isActive
+                    ? 'bg-gray-700 border-green-400'
+                    : 'bg-gray-700 border-gray-500'
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -264,8 +266,8 @@ const Alerts = () => {
                     <button
                       onClick={() => handleToggleAlert(alert.id, alert.isActive)}
                       className={`p-2 rounded-lg ${alert.isActive
-                          ? 'text-green-400 hover:bg-green-900'
-                          : 'text-gray-400 hover:bg-gray-600'
+                        ? 'text-green-400 hover:bg-green-900'
+                        : 'text-gray-400 hover:bg-gray-600'
                         }`}
                     >
                       {alert.isActive ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}

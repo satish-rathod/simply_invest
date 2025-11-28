@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, List, Eye, TrendingUp, TrendingDown, Star, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, List, Eye, TrendingUp, TrendingDown, Star, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import WatchListSkeleton from './WatchListSkeleton';
+import config from '../config';
 
 const WatchLists = () => {
   const [watchLists, setWatchLists] = useState([]);
@@ -11,26 +13,13 @@ const WatchLists = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateWatchList, setShowCreateWatchList] = useState(false);
   const [showAddSymbol, setShowAddSymbol] = useState(false);
-  const [watchListForm, setWatchListForm] = useState({
-    name: '',
-    symbols: []
-  });
+  const [watchListForm, setWatchListForm] = useState({ name: '', symbols: [] });
   const [newSymbol, setNewSymbol] = useState('');
 
-  useEffect(() => {
-    fetchWatchLists();
-  }, []);
-
-  useEffect(() => {
-    if (selectedWatchList) {
-      fetchWatchListData(selectedWatchList);
-    }
-  }, [selectedWatchList]);
-
-  const fetchWatchLists = async () => {
+  const fetchWatchLists = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5001/api/watchlists', {
+      const response = await axios.get(`${config.API_URL}/api/watchlists`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWatchLists(response.data);
@@ -43,12 +32,16 @@ const WatchLists = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedWatchList]);
 
-  const fetchWatchListData = async (watchListId) => {
+  useEffect(() => {
+    fetchWatchLists();
+  }, [fetchWatchLists]);
+
+  const fetchWatchListData = useCallback(async (watchListId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5001/api/watchlists/${watchListId}/prices`, {
+      const response = await axios.get(`${config.API_URL}/api/watchlists/${watchListId}/prices`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWatchListData(response.data);
@@ -56,13 +49,19 @@ const WatchLists = () => {
       console.error('Error fetching watch list data:', error);
       toast.error('Failed to load watch list data');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (selectedWatchList) {
+      fetchWatchListData(selectedWatchList);
+    }
+  }, [selectedWatchList, fetchWatchListData]);
 
   const handleCreateWatchList = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5001/api/watchlists', watchListForm, {
+      const response = await axios.post(`${config.API_URL}/api/watchlists`, watchListForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -83,7 +82,7 @@ const WatchLists = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5001/api/watchlists/${selectedWatchList}/add-symbol`,
+      await axios.post(`${config.API_URL}/api/watchlists/${selectedWatchList}/add-symbol`,
         { symbol: newSymbol.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -104,7 +103,7 @@ const WatchLists = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5001/api/watchlists/${selectedWatchList}/remove-symbol`,
+      await axios.post(`${config.API_URL}/api/watchlists/${selectedWatchList}/remove-symbol`,
         { symbol },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -123,7 +122,7 @@ const WatchLists = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/api/watchlists/${watchListId}`, {
+      await axios.delete(`${config.API_URL}/api/watchlists/${watchListId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -143,11 +142,7 @@ const WatchLists = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <WatchListSkeleton />;
   }
 
   return (
@@ -189,8 +184,8 @@ const WatchLists = () => {
                   key={watchList.id}
                   whileHover={{ scale: 1.02 }}
                   className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedWatchList === watchList.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   onClick={() => setSelectedWatchList(watchList.id)}
                 >

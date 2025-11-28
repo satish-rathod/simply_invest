@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import config from '../config';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = config.API_URL;
 
 export const usePublicStats = () => {
     const [data, setData] = useState(null);

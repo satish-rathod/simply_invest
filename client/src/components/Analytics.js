@@ -4,6 +4,8 @@ import { TrendingUp, TrendingDown, Target, AlertCircle, PieChart, BarChart3, Act
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell } from 'recharts';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import AnalyticsSkeleton from './AnalyticsSkeleton';
+import config from '../config';
 
 const Analytics = () => {
   const [riskAnalysis, setRiskAnalysis] = useState(null);
@@ -20,10 +22,10 @@ const Analytics = () => {
     try {
       const token = localStorage.getItem('token');
       const [riskRes, performanceRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/analytics/portfolio-risk', {
+        axios.get(`${config.API_URL}/api/analytics/portfolio-risk`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5001/api/analytics/performance', {
+        axios.get(`${config.API_URL}/api/analytics/performance`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -35,7 +37,7 @@ const Analytics = () => {
       if (performanceRes.data.stockPerformance) {
         const topStocks = performanceRes.data.stockPerformance.slice(0, 5);
         const predictionPromises = topStocks.map(stock =>
-          axios.get(`http://localhost:5001/api/analytics/prediction/${stock.symbol}`, {
+          axios.get(`${config.API_URL}/api/analytics/prediction/${stock.symbol}`, {
             headers: { Authorization: `Bearer ${token}` }
           }).catch(err => ({ data: null }))
         );

@@ -3,6 +3,11 @@ import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 import { Search, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import config from '../config';
+
+import MarketOverviewSkeleton from './MarketOverviewSkeleton';
+import { Skeleton } from './ui/Skeleton';
+
 
 const MarketOverview = () => {
     const [symbol, setSymbol] = useState('SPY');
@@ -33,7 +38,7 @@ const MarketOverview = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get(`http://localhost:5001/api/finance/chart`, {
+            const response = await axios.get(`${config.API_URL}/api/finance/chart`, {
                 params: { symbol: sym, period, interval }
             });
             setChartData(response.data);
@@ -48,7 +53,7 @@ const MarketOverview = () => {
 
     const fetchStockSummary = async (sym) => {
         try {
-            const response = await axios.get(`http://localhost:5001/api/finance/stock-summary`, {
+            const response = await axios.get(`${config.API_URL}/api/finance/stock-summary`, {
                 params: { symbol: sym }
             });
             setStockSummary(response.data);
@@ -65,7 +70,7 @@ const MarketOverview = () => {
 
     const fetchMarketSummary = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/finance/market-summary');
+            const response = await axios.get(`${config.API_URL}/api/finance/market-summary`);
             setMarketSummary(response.data);
         } catch (err) {
             console.error('Error fetching market summary:', err);
@@ -95,6 +100,10 @@ const MarketOverview = () => {
         fetchChartData('SPY', currentRange.period, currentRange.interval);
     };
 
+    if (loading && !chartData.length) {
+        return <MarketOverviewSkeleton />;
+    }
+
     return (
         <motion.div
             className="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col h-full"
@@ -115,13 +124,13 @@ const MarketOverview = () => {
                     )}
                 </div>
                 <form onSubmit={handleSearch} className="flex items-center">
-                    <div className="relative">
+                    <div className="relative flex">
                         <input
                             type="text"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            placeholder="Search Symbol (e.g., AAPL)"
-                            className="bg-gray-700 text-white px-4 py-2 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+                            placeholder="Search Symbol"
+                            className="bg-gray-700 text-white px-4 py-2 rounded-l-lg focus:outline-none focus:ring-blue-500 w-48"
                         />
                         <button
                             type="submit"
@@ -153,8 +162,8 @@ const MarketOverview = () => {
                     </div>
                 </div>
                 {loading ? (
-                    <div className="flex justify-center items-center h-96 bg-gray-900 rounded-xl">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <div className="bg-gray-900 rounded-xl p-4 h-96">
+                        <Skeleton className="w-full h-full rounded-lg" />
                     </div>
                 ) : error ? (
                     <div className="flex flex-col justify-center items-center h-96 bg-gray-900 rounded-xl text-red-400">

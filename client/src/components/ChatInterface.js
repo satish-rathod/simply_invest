@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 const ChatInterface = () => {
   const [sessions, setSessions] = useState([]);
@@ -13,7 +14,7 @@ const ChatInterface = () => {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  const API_BASE = 'http://localhost:5001/api/chat';
+  const API_BASE = `${config.API_URL}/api/chat`;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

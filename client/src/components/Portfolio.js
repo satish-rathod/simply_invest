@@ -4,12 +4,13 @@ import { Plus, TrendingUp, TrendingDown, DollarSign, Target, Activity, Edit, Tra
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import PortfolioSkeleton from './PortfolioSkeleton';
+import config from '../config';
 
 const Portfolio = () => {
   const [portfolio, setPortfolio] = useState(null);
   const [performance, setPerformance] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [virtualBalance, setVirtualBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showAddStock, setShowAddStock] = useState(false);
   const [showSellStock, setShowSellStock] = useState(false);
@@ -32,13 +33,13 @@ const Portfolio = () => {
     try {
       const token = localStorage.getItem('token');
       const [portfolioRes, performanceRes, transactionsRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/portfolio?type=PERSONAL', {
+        axios.get(`${config.API_URL}/api/portfolio?type=PERSONAL`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5001/api/portfolio/performance?type=PERSONAL', {
+        axios.get(`${config.API_URL}/api/portfolio/performance?type=PERSONAL`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5001/api/portfolio/transactions?type=PERSONAL', {
+        axios.get(`${config.API_URL}/api/portfolio/transactions?type=PERSONAL`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -62,7 +63,7 @@ const Portfolio = () => {
   const createPortfolio = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5001/api/portfolio', {}, {
+      const response = await axios.post(`${config.API_URL}/api/portfolio`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPortfolio(response.data);
@@ -91,7 +92,7 @@ const Portfolio = () => {
         quantity: Number(stockForm.quantity),
         price: Number(stockForm.price)
       };
-      await axios.post('http://localhost:5001/api/portfolio/add-stock', payload, {
+      await axios.post(`${config.API_URL}/api/portfolio/add-stock`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -131,7 +132,7 @@ const Portfolio = () => {
       }
 
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5001/api/portfolio/remove-stock',
+      await axios.post(`${config.API_URL}/api/portfolio/remove-stock`,
         { symbol: selectedHolding.symbol, quantity, price },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -151,7 +152,7 @@ const Portfolio = () => {
     try {
       const token = localStorage.getItem('token');
       // Ensure numbers are sent to prevent issues
-      await axios.post('http://localhost:5001/api/portfolio/remove-stock',
+      await axios.post(`${config.API_URL}/api/portfolio/remove-stock`,
         { symbol, quantity: Number(quantity), price: Number(price) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -177,11 +178,7 @@ const Portfolio = () => {
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0'];
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <PortfolioSkeleton />;
   }
 
   return (
