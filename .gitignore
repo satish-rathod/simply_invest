@@ -32,6 +32,9 @@ tmp/
 temp/
 *.tmp
 
+# Git config
+.gitconfig
+
 # Miscellaneous
 *.tgz
 *.gz
